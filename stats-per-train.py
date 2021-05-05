@@ -322,7 +322,6 @@ if __name__ == '__main__':
             import pandas as pd
             csv_input = pd.read_csv(f'data/{version}.csv')
             csv_input['conductor'] = conductor
-            csv_input['conductor'] = conductor
             csv_input['version'] = version
             csv_input['patches'] = count
             csv_input['rollbacks'] = rollbacks
@@ -330,7 +329,7 @@ if __name__ == '__main__':
             csv_input['group0_delay_days'] = group0
             csv_input['group1_delay_days'] = group1
             csv_input['group2_delay_days'] = group2
-            csv_input['train_time'] = train_total_time
+            csv_input['train_total_time'] = train_total_time
             csv_input.to_csv(f'data/{version}.csv', index=False)
             sys.exit(0)
 
@@ -362,6 +361,7 @@ if __name__ == '__main__':
                 info = get_patch_info(patch)
                 if info is None:
                     continue
+                info['conductor'] = conductor
                 info['version'] = version
                 info['patches'] = count
                 info['rollbacks'] = rollbacks
