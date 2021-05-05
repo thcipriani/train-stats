@@ -289,6 +289,11 @@ if __name__ == '__main__':
         action='store_true',
         help='only show rollbacks'
     )
+    ap.add_argument(
+        '--append-stats-for-thcipriani-zomg',
+        action='store_true',
+        help='ZOMG don\'t use this!!11!'
+    )
     args = ap.parse_args()
 
     patches_for_version = {}
@@ -297,18 +302,41 @@ if __name__ == '__main__':
         if wikiversion_changes is None:
             raise RuntimeError(f'{version} was never deployed!')
 
+        rollbacks = count_rollbacks(version, wikiversion_changes)
+        conductor = get_conductor(version, wikiversion_changes)
+        rollbacks_time = time_rolledback(version, wikiversion_changes)
+        group0, group1, group2 = train_delays(version, wikiversion_changes)
+        train_total_time = total_train_time(version, wikiversion_changes)
+
         if args.rollbacks_only:
-            print(count_rollbacks(version, wikiversion_changes))
-            print(get_conductor(version, wikiversion_changes))
-            print(time_rolledback(version, wikiversion_changes))
-            print(train_delays(version, wikiversion_changes))
-            print(total_train_time(version, wikiversion_changes))
+            print(f'CONDUCTOR: {conductor}')
+            print(f'ROLLBACKS COUNT: {rollbacks}')
+            print(f'TIME ROLLEDBACK (seconds): {rollbacks_time}')
+            print(f'DELAYS (days)\n----\n\tGROUP0: {group0}\n\tGROUP1: {group1}\n\tGROUP2: {group2}')
+            print(f'TIME TOTAL (seconds): {train_total_time}')
             sys.exit(0)
 
         patches, count = get_patches_for_version(version)
         patches_for_version[version] = patches
+        if args.append_stats_for_thcipriani_zomg:
+            import pandas as pd
+            csv_input = pd.read_csv(f'data/{version}.csv')
+            csv_input['conductor'] = conductor
+            csv_input['conductor'] = conductor
+            csv_input['version'] = version
+            csv_input['patches'] = count
+            csv_input['rollbacks'] = rollbacks
+            csv_input['rollbacks_time'] = rollbacks_time
+            csv_input['group0_delay_days'] = group0
+            csv_input['group1_delay_days'] = group1
+            csv_input['group2_delay_days'] = group2
+            csv_input['train_time'] = train_total_time
+            csv_input.to_csv(f'data/{version}.csv', index=False)
+            sys.exit(0)
+
         with open(f'data/{version}.csv', 'w', newline='') as csvfile:
             fieldnames = [
+                'version',
                 'created',
                 'submitted',
                 'insertions',
@@ -317,9 +345,14 @@ if __name__ == '__main__':
                 'total_comment_count',
                 'link',
                 'time_in_review',
-                'version',
                 'patches',
+                'conductor',
                 'rollbacks',
+                'rollbacks_time',
+                'group0_delay_days',
+                'group1_delay_days',
+                'group2_delay_days',
+                'train_total_time'
             ]
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             writer.writeheader()
@@ -332,5 +365,10 @@ if __name__ == '__main__':
                 info['version'] = version
                 info['patches'] = count
                 info['rollbacks'] = rollbacks
+                info['rollbacks_time'] = rollbacks_time
+                info['group0_delay_days'] = group0
+                info['group1_delay_days'] = group1
+                info['group2_delay_days'] = group2
+                info['train_total_time'] = train_total_time
                 writer.writerow(info)
                 print(info)
