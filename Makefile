@@ -18,7 +18,7 @@ csvs-from-scratch:
 	for i in {1..26}; do python3 stats-per-train.py -w 1.32.0-wmf.$$i; done
 	for i in {1..30}; do python3 stats-per-train.py -w 1.31.0-wmf.$$i; done
 
-README.html:
-	jupyter nbconvert README.ipynb --to html --no-input --output README.html
+README.rst:
+	jupyter nbconvert README.ipynb --to rst --no-input --output README.rst
 
 .PHONY: csvs-from-scratch zomg
