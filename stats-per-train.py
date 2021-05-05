@@ -190,7 +190,7 @@ def get_conductor(version, changes):
             # debug
             print('{}: {} ROLLFORWARD'.format(change['committer'], change['sha1']))
             conductors.append(change['committer'])
-    return mode(conductors)
+    return mode([c for c in conductors if c != 'jenkins-bot'])
 
 
 def time_rolledback(version, changes):
@@ -218,18 +218,19 @@ def count_rollbacks(version, changes):
     return rollbacks
 
 def total_train_time(version, changes):
-    sorted_commits = sorted(changes, key=lambda x: x['commit_date'])
+    roll_forwards = [x for x in changes if x['rollforward']]
+    sorted_commits = sorted(roll_forwards, key=lambda x: x['commit_date'])
     return sorted_commits[-1]['commit_date'] - sorted_commits[0]['commit_date']
 
 def train_delays(version, changes):
     # Monday = 1; Sunday = 7
     expected = {
-        'mediawiki': 2,   # Tuesday
-        'commons': 3,     # Wednesday
+        'mediawikiwiki': 2,   # Tuesday
+        'commonswiki': 3,     # Wednesday
         'enwiki': 4,      # Thursday
     }
     # Initialized to preserve the order for return
-    delays = { 'mediawiki': 0, 'commons': 0, 'enwiki': 0 }
+    delays = { 'mediawikiwiki': 0, 'commonswiki': 0, 'enwiki': 0 }
     for change in sorted(changes, key=lambda x: x['commit_date']):
         if change['rollforward']:
             for wiki, exp in expected.items():
@@ -330,6 +331,10 @@ if __name__ == '__main__':
             csv_input['group1_delay_days'] = group1
             csv_input['group2_delay_days'] = group2
             csv_input['train_total_time'] = train_total_time
+            try:
+                del csv_input['train_time']
+            except KeyError:
+                pass  # This is me being bad at data
             csv_input.to_csv(f'data/{version}.csv', index=False)
             sys.exit(0)
 
