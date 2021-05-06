@@ -63,6 +63,19 @@ df.describe()
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -217,16 +230,20 @@ We need to aggregate differently per column. Some columns should be the `max`, o
 
 ```python
 # from scipy import stats
+import numpy
+
+def percentile_95(x):
+    return numpy.percentile(x, 95)
 
 agg_df = df.groupby('version').agg({
 #    'conductor': lambda x:stats.mode(x)[0],  # I don't know that I care about this…keeping it here to save me from looking at StackOverflow®™©
     'rollbacks': 'max',
-    'total_comment_count': 'sum',
+    'total_comment_count': ['var', 'sum', percentile_95],
     'insertions': 'sum',
     'deletions': 'sum',
-    'loc_change': 'sum',
+    'loc_change': ['var', 'sum', percentile_95],
     'patches': 'sum',
-    'time_in_review': 'sum',
+    'time_in_review': ['var', 'sum', percentile_95],
     'patches': 'max',
     'rollbacks_time': 'max',
     'group0_delay_days': 'max',
@@ -241,17 +258,34 @@ agg_df.head()
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead tr th {
+        text-align: left;
+    }
+
+    .dataframe thead tr:last-of-type th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
-    <tr style="text-align: right;">
+    <tr>
       <th></th>
       <th>rollbacks</th>
-      <th>total_comment_count</th>
+      <th colspan="3" halign="left">total_comment_count</th>
       <th>insertions</th>
       <th>deletions</th>
-      <th>loc_change</th>
+      <th colspan="3" halign="left">loc_change</th>
       <th>patches</th>
-      <th>time_in_review</th>
+      <th colspan="3" halign="left">time_in_review</th>
       <th>rollbacks_time</th>
       <th>group0_delay_days</th>
       <th>group1_delay_days</th>
@@ -259,7 +293,34 @@ agg_df.head()
       <th>train_total_time</th>
     </tr>
     <tr>
+      <th></th>
+      <th>max</th>
+      <th>var</th>
+      <th>sum</th>
+      <th>percentile_95</th>
+      <th>sum</th>
+      <th>sum</th>
+      <th>var</th>
+      <th>sum</th>
+      <th>percentile_95</th>
+      <th>max</th>
+      <th>var</th>
+      <th>sum</th>
+      <th>percentile_95</th>
+      <th>max</th>
+      <th>max</th>
+      <th>max</th>
+      <th>max</th>
+      <th>max</th>
+    </tr>
+    <tr>
       <th>version</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
       <th></th>
       <th></th>
       <th></th>
@@ -278,12 +339,18 @@ agg_df.head()
     <tr>
       <th>1.31.0-wmf.1</th>
       <td>0</td>
+      <td>14.504515</td>
       <td>1416</td>
+      <td>11.00</td>
       <td>6364</td>
       <td>4758</td>
+      <td>6.021532e+03</td>
       <td>11122</td>
+      <td>122.20</td>
       <td>399</td>
+      <td>1.212775e+13</td>
       <td>243850263.0</td>
+      <td>1944153.70</td>
       <td>0</td>
       <td>0</td>
       <td>0</td>
@@ -293,12 +360,18 @@ agg_df.head()
     <tr>
       <th>1.31.0-wmf.11</th>
       <td>1</td>
+      <td>35.426994</td>
       <td>1799</td>
+      <td>15.00</td>
       <td>77419</td>
       <td>68374</td>
+      <td>3.162981e+07</td>
       <td>145793</td>
+      <td>333.35</td>
       <td>335</td>
+      <td>1.784497e+13</td>
       <td>222521732.0</td>
+      <td>1931431.15</td>
       <td>5833</td>
       <td>0</td>
       <td>0</td>
@@ -308,12 +381,18 @@ agg_df.head()
     <tr>
       <th>1.31.0-wmf.12</th>
       <td>0</td>
+      <td>20.770749</td>
       <td>1307</td>
+      <td>12.35</td>
       <td>8200</td>
       <td>4387</td>
+      <td>1.124251e+04</td>
       <td>12587</td>
+      <td>155.15</td>
       <td>374</td>
+      <td>2.986819e+12</td>
       <td>102204853.0</td>
+      <td>683185.25</td>
       <td>0</td>
       <td>0</td>
       <td>0</td>
@@ -323,12 +402,18 @@ agg_df.head()
     <tr>
       <th>1.31.0-wmf.15</th>
       <td>0</td>
+      <td>119.607756</td>
       <td>3887</td>
+      <td>15.00</td>
       <td>42063</td>
       <td>31584</td>
+      <td>2.069064e+05</td>
       <td>73647</td>
+      <td>322.00</td>
       <td>756</td>
+      <td>3.122607e+13</td>
       <td>554068249.0</td>
+      <td>1518525.50</td>
       <td>0</td>
       <td>0</td>
       <td>0</td>
@@ -338,12 +423,18 @@ agg_df.head()
     <tr>
       <th>1.31.0-wmf.16</th>
       <td>1</td>
+      <td>65.291328</td>
       <td>1708</td>
+      <td>18.00</td>
       <td>13006</td>
       <td>8376</td>
+      <td>6.559969e+04</td>
       <td>21382</td>
+      <td>290.65</td>
       <td>288</td>
+      <td>4.485630e+12</td>
       <td>183990614.0</td>
+      <td>3093578.10</td>
       <td>431612</td>
       <td>1</td>
       <td>6</td>
