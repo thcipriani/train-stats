@@ -360,6 +360,8 @@ def setup_db():
             FOREIGN KEY(patch_id) REFERENCES patch(id)
         );
     ''')
+    # Needed to count patches as sub-query
+    crs.execute('CREATE INDEX IF NOT EXISTS file_patch_id ON file(patch_id);')
     conn.commit()
     return conn
 
