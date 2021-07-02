@@ -18,11 +18,14 @@ from datetime import date, datetime
 from statistics import mode
 import sqlite3
 
+import utils
+import trainblockers
+import git
+
 BASE_URL = 'https://www.mediawiki.org/wiki/'
 FMT_URL = 'MediaWiki_{}/Changelog'
 GERRIT = 'https://gerrit.wikimedia.org/r'
 
-MWCONFIG_PATH = './submodules/operations/mediawiki-config'
 DB_PATH = './data/train.db'
 
 
@@ -158,15 +161,15 @@ def wikiversion_info(version, change):
     wikis = {}
     # Get the diff for the change
     diff = subprocess.check_output([
-        'git', '-C', MWCONFIG_PATH, 'diff-tree', '-p', '-U0', change, 'wikiversions.json'
+        'git', '-C', git.MWCONFIG_PATH, 'diff-tree', '-p', '-U0', change, 'wikiversions.json'
     ])
 
     committer = subprocess.check_output([
-        'git', '-C', MWCONFIG_PATH, 'log', '-1', '--format=%cN', change
+        'git', '-C', git.MWCONFIG_PATH, 'log', '-1', '--format=%cN', change
     ]).decode('utf8').strip()
 
     commit_date = int(subprocess.check_output([
-        'git', '-C', MWCONFIG_PATH, 'log', '-1', '--format=%ct', change
+        'git', '-C', git.MWCONFIG_PATH, 'log', '-1', '--format=%ct', change
     ]).decode('utf8').strip())
 
     # That's right. It's a regex for parsing a diff. Fight me.
@@ -286,7 +289,7 @@ def get_wikiversion_changes(version):
     # Oldest commit to wikiversions mentioning "version"
     oldest_cmd = [
         '/usr/bin/git',
-        '-C', MWCONFIG_PATH,
+        '-C', git.MWCONFIG_PATH,
         'log',
         '-G', f'\\b{version}\\b',  #-G vs --grep: -G searches body of commit
         '--reverse',
@@ -300,7 +303,7 @@ def get_wikiversion_changes(version):
     oldest_commit_with_version = commits_with_version.splitlines()[0]
     all_changes_cmd = [
         '/usr/bin/git',
-        '-C', MWCONFIG_PATH,
+        '-C', git.MWCONFIG_PATH,
         'log',
         '--format=%H',
         f'{oldest_commit_with_version}..HEAD',
@@ -360,6 +363,27 @@ def setup_db():
             FOREIGN KEY(patch_id) REFERENCES patch(id)
         );
     ''')
+    crs.execute('''
+        CREATE TABLE IF NOT EXISTS blocker (
+            id INTEGER PRIMARY KEY,
+            train_id INTEGER NOT NULL,
+            blocked INTEGER NOT NULL,
+            unblocked INTEGER NOT NULL,
+            blocker TEXT NOT NULL,
+            unblocker TEXT NOT NULL,
+            removed INTEGER NOT NULL,
+            resolved INTEGER NOT NULL,
+            task INTEGER NOT NULL,
+            url TEXT NOT NULL,
+            status TEXT NOT NULL,
+            group_blocked INTEGER NOT NULL,
+            group_unblocked INTEGER NOT NULL,
+            CHECK (removed IN (0, 1))
+            CHECK (resolved IN (0, 1))
+            UNIQUE(train_id,blocked,task)
+            FOREIGN KEY(train_id) REFERENCES train(id)
+        );
+    ''')
     # Needed to count patches as sub-query
     crs.execute('CREATE INDEX IF NOT EXISTS file_patch_id ON file(patch_id);')
     conn.commit()
@@ -367,27 +391,7 @@ def setup_db():
 
 
 if __name__ == '__main__':
-    ap = argparse.ArgumentParser()
-    ap.add_argument(
-        '-w',
-        '--wmf-version',
-        dest='versions',
-        action='append',
-        required=True,
-        help='wmf version'
-    )
-    ap.add_argument(
-        '--rollbacks-only',
-        action='store_true',
-        help='only show rollbacks'
-    )
-    ap.add_argument(
-        '--only-update',
-        action='store_true',
-        help='update only'
-    )
-    args = ap.parse_args()
-
+    args = utils.parse_args()
     conn = setup_db()
     crs = conn.cursor()
 
@@ -404,7 +408,19 @@ if __name__ == '__main__':
         train_total_time = total_train_time(version, wikiversion_changes)
 
         patches, patch_count = get_patches_for_version(version)
-        if not args.only_update:
+
+        # Don't touch data, just print and exit
+        if args.show_rollbacks:
+            print(f'CONDUCTOR: {conductor}')
+            print(f'ROLLBACKS COUNT: {rollbacks}')
+            print(f'TIME ROLLEDBACK (seconds): {rollbacks_time}')
+            print(f'DELAYS (days)\n----\n\tGROUP0: {group0}\n\tGROUP1: {group1}\n\tGROUP2: {group2}')
+            print(f'TIME TOTAL (seconds): {train_total_time}')
+            sys.exit(0)
+
+        # We actually want to update the train table, not just patches or
+        # blockers
+        if not args.only_patches and not args.only_blockers:
             crs.execute('''
                 INSERT INTO train(
                     version,
@@ -429,17 +445,76 @@ if __name__ == '__main__':
                 )
             )
             conn.commit()
-        if args.rollbacks_only:
-            print(f'CONDUCTOR: {conductor}')
-            print(f'ROLLBACKS COUNT: {rollbacks}')
-            print(f'TIME ROLLEDBACK (seconds): {rollbacks_time}')
-            print(f'DELAYS (days)\n----\n\tGROUP0: {group0}\n\tGROUP1: {group1}\n\tGROUP2: {group2}')
-            print(f'TIME TOTAL (seconds): {train_total_time}')
-            sys.exit(0)
 
         train_id = crs.execute(
             'SELECT id FROM train WHERE version = ?', (version,)
         ).fetchone()[0]
+
+        if not args.only_patches:
+            tb = trainblockers.new_trainblockers(version)
+            print('\t'.join([
+                'train_id',
+                'blocked',
+                'unblocked',
+                'blocker',
+                'unblocker',
+                'removed',
+                'resolved',
+                'task',
+                'url',
+                'status',
+                'group_blocked',
+                'group_unblocked'
+            ]))
+
+            for blocker in tb.blockers:
+                print('\t'.join([str(fuck) for fuck in [
+                    train_id,
+                    blocker.blocked,
+                    blocker.unblocked,
+                    blocker.blocker,
+                    blocker.unblocker,
+                    blocker.removed,
+                    blocker.resolved,
+                    blocker.id,
+                    blocker.url,
+                    blocker.status,
+                    blocker.group_blocked,
+                    blocker.group_unblocked,
+                ]]))
+                crs.execute('''
+                    INSERT INTO blocker(
+                        train_id,
+                        blocked,
+                        unblocked,
+                        blocker,
+                        unblocker,
+                        removed,
+                        resolved,
+                        task,
+                        url,
+                        status,
+                        group_blocked,
+                        group_unblocked)
+                    VALUES(?,?,?,?,?,?,?,?,?,?,?,?)''', (
+                        train_id,
+                        blocker.blocked,
+                        blocker.unblocked,
+                        blocker.blocker,
+                        blocker.unblocker,
+                        blocker.removed,
+                        blocker.resolved,
+                        blocker.id,
+                        blocker.url,
+                        blocker.status,
+                        blocker.group_blocked,
+                        blocker.group_unblocked,
+                    )
+                )
+                conn.commit()
+
+        if args.only_blockers:
+            sys.exit(0)
 
         patches_for_version[version] = patches
         for patch in patches_for_version[version]:
