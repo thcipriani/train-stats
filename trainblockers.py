@@ -42,7 +42,7 @@ class TrainBlocker(object):
         self.blocker = None
         self.unblocker = None
         self.unblocked = None
-        self.blocked = None
+        self.blocked_date = None
         self.group_blocked = None
         self.group_unblocked = None
 
@@ -64,6 +64,18 @@ class TrainBlocker(object):
             return None
         return self.task['fields']['status']['value']
 
+    @property
+    def blocked(self):
+        """
+        This is necessary since a task created via the "Create subtask link"
+        is never "added" to the parent task. See::
+        https://phabricator.wikimedia.org/T286091
+        """
+        if not self.blocked_date:
+            self.blocked_date = self.task['fields']['dateCreated']
+
+        return self.blocked_date
+
 
 class TrainBlockers(object):
     def __init__(self, version, phab):
@@ -84,9 +96,16 @@ class TrainBlockers(object):
 
         return blocker
 
+    def _get_phab_user(self, authorPHID):
+        user = self.phab.user.search(
+            constraints={'phids': [authorPHID]}
+        )['data'][0]['fields']
+
+        # TIL this syntax works in python and doesn't return a bool
+        return user['realName'] or user['username']
+
     def _parse_blockers(self, transactions):
         for transaction in transactions:
-            # Closed a subtask
             if transaction['transactionType'] == 'unblock':
                 phid = list(transaction['oldValue'].keys())[0]
                 self._parse_unblock(phid, transaction, resolved=True)
@@ -107,18 +126,14 @@ class TrainBlockers(object):
             blocker.removed = removed
         if resolved:
             blocker.resolved = resolved
-        blocker.unblocker = self.phab.user.search(
-            constraints={'phids': [transaction['authorPHID']]}
-        )['data'][0]['fields']['realName']
+        blocker.unblocker = self._get_phab_user(transaction['authorPHID'])
         blocker.unblocked = int(transaction['dateCreated'])
         blocker.group_unblocked = group_at_time(transaction['dateCreated'], self.version)
 
     def _parse_block(self, phid, transaction):
         blocker = self._get_blocker(phid)
-        blocker.blocker = self.phab.user.search(
-            constraints={'phids': [transaction['authorPHID']]}
-        )['data'][0]['fields']['realName']
-        blocker.blocked = int(transaction['dateCreated'])
+        blocker.blocker = self._get_phab_user(transaction['authorPHID'])
+        blocker.blocked_date = int(transaction['dateCreated'])
         blocker.group_blocked = group_at_time(transaction['dateCreated'], self.version)
 
     @property
@@ -146,6 +161,6 @@ if __name__ == '__main__':
 
     for version in args.versions:
         tb = new_trainblockers(version)
-        tb.blockers
+        print([x.unblocker for x in tb.blockers])
         import pdb
         pdb.set_trace()
