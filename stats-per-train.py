@@ -70,6 +70,7 @@ def get_patch_info(changelog_item):
     if not isinstance(patch_jsons, list):
         patch_jsons = [patch_jsons]
     for patch in patch_jsons:
+        # Match the sha1 from the changelog to the sha1 we just found
         sha1 = [*patch['revisions'].keys()][0]
         if not sha1.startswith(change_id):
             continue
@@ -511,7 +512,7 @@ if __name__ == '__main__':
                         blocker.group_unblocked,
                     )
                 )
-                conn.commit()
+            conn.commit()
 
         if args.only_blockers:
             sys.exit(0)
