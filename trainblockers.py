@@ -34,17 +34,28 @@ def group_at_time(time, version):
     return -1
 
 
+def get_phab_user(authorPHID, phab):
+    user = phab.user.search(
+        constraints={'phids': [authorPHID]}
+    )['data'][0]['fields']
+
+    # TIL this syntax works in python and doesn't return a bool
+    return user['realName'] or user['username']
+
+
 class TrainBlocker(object):
     def __init__(self):
         self.task = None
         self.removed = False
         self.resolved = False
-        self.blocker = None
+        self.blocker_name = None
         self.unblocker = None
         self.unblocked = None
         self.blocked_date = None
-        self.group_blocked = None
+        self.group_blocked_at = None
         self.group_unblocked = None
+        self.version = None
+        self.phab = None
 
     @property
     def id(self):
@@ -76,6 +87,27 @@ class TrainBlocker(object):
 
         return self.blocked_date
 
+    @property
+    def group_blocked(self):
+        """
+        See comment for 'blocked'
+        """
+        if not self.group_blocked_at:
+            self.group_blocked_at = group_at_time(
+                str(self.blocked), self.version)
+
+        return self.group_blocked_at
+
+    @property
+    def blocker(self):
+        """
+        See comment for 'blocked'
+        """
+        if not self.blocker_name:
+            self.blocker_name = get_phab_user(
+                self.task['fields']['authorPHID'], self.phab)
+        return self.blocker_name
+
 
 class TrainBlockers(object):
     def __init__(self, version, phab):
@@ -90,19 +122,13 @@ class TrainBlockers(object):
         blocker = self._blockers.get(phid)
         if blocker is None:
             self._blockers[phid] = blocker = TrainBlocker()
+            blocker.version = self.version
+            blocker.phab = self.phab
             blocker.task = self.phab.maniphest.search(
                 constraints={'phids': [phid]}
             )['data'][0]
 
         return blocker
-
-    def _get_phab_user(self, authorPHID):
-        user = self.phab.user.search(
-            constraints={'phids': [authorPHID]}
-        )['data'][0]['fields']
-
-        # TIL this syntax works in python and doesn't return a bool
-        return user['realName'] or user['username']
 
     def _parse_blockers(self, transactions):
         for transaction in transactions:
@@ -126,15 +152,15 @@ class TrainBlockers(object):
             blocker.removed = removed
         if resolved:
             blocker.resolved = resolved
-        blocker.unblocker = self._get_phab_user(transaction['authorPHID'])
+        blocker.unblocker = get_phab_user(transaction['authorPHID'], self.phab)
         blocker.unblocked = int(transaction['dateCreated'])
         blocker.group_unblocked = group_at_time(transaction['dateCreated'], self.version)
 
     def _parse_block(self, phid, transaction):
         blocker = self._get_blocker(phid)
-        blocker.blocker = self._get_phab_user(transaction['authorPHID'])
+        blocker.blocker_name = get_phab_user(transaction['authorPHID'], self.phab)
         blocker.blocked_date = int(transaction['dateCreated'])
-        blocker.group_blocked = group_at_time(transaction['dateCreated'], self.version)
+        blocker.group_blocked_at = group_at_time(transaction['dateCreated'], self.version)
 
     @property
     def blocker_task(self):
