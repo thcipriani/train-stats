@@ -1,7 +1,7 @@
 SHELL=/bin/bash
 
 blockers:
-	for i in {1..6}; do python3 stats-per-train.py --only-blockers -w 1.37.0-wmf.$$i; done
+	for i in {5..6}; do python3 stats-per-train.py --only-blockers -w 1.37.0-wmf.$$i; done
 	for i in {1..38}; do python3 stats-per-train.py --only-blockers -w 1.36.0-wmf.$$i; done
 	for i in {1..41}; do python3 stats-per-train.py --only-blockers -w 1.35.0-wmf.$$i; done
 	for i in {1..25}; do python3 stats-per-train.py --only-blockers -w 1.34.0-wmf.$$i; done
