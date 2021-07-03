@@ -49,11 +49,11 @@ class TrainBlocker(object):
         self.removed = False
         self.resolved = False
         self.blocker_name = None
-        self.unblocker = None
-        self.unblocked = None
+        self.unblocker_name = None
+        self.unblocked_date = None
         self.blocked_date = None
         self.group_blocked_at = None
-        self.group_unblocked = None
+        self.group_unblocked_at = None
         self.version = None
         self.phab = None
 
@@ -74,6 +74,37 @@ class TrainBlocker(object):
         if not self.task:
             return None
         return self.task['fields']['status']['value']
+
+    @property
+    def unblocked(self):
+        """
+        Phuck you phabricator you stupid fucking piece of shit software
+        your fucking api is fucking horrible you stupid piece of shit!!!
+        """
+        if not self.unblocked_date:
+            self.unblocked_date = self.task['fields'].get('dateClosed', 0)
+
+        return self.unblocked_date
+
+    @property
+    def group_unblocked(self):
+        if not self.group_unblocked_at:
+            self.group_unblocked_at = group_at_time(
+                str(self.unblocked), self.version)
+
+        return self.group_unblocked_at
+
+    @property
+    def unblocker(self):
+        """
+        See comment for 'blocked'
+        """
+        if not self.unblocker_name:
+            self.unblocker_name = get_phab_user(
+                self.task['fields']['closerPHID'], self.phab)
+            if self.unblocker_name is None:
+                self.unblocker_name = 'null'
+        return self.unblocker_name
 
     @property
     def blocked(self):
@@ -152,9 +183,9 @@ class TrainBlockers(object):
             blocker.removed = removed
         if resolved:
             blocker.resolved = resolved
-        blocker.unblocker = get_phab_user(transaction['authorPHID'], self.phab)
-        blocker.unblocked = int(transaction['dateCreated'])
-        blocker.group_unblocked = group_at_time(transaction['dateCreated'], self.version)
+        blocker.unblocker_name = get_phab_user(transaction['authorPHID'], self.phab)
+        blocker.unblocked_date = int(transaction['dateCreated'])
+        blocker.group_unblocked_at = group_at_time(transaction['dateCreated'], self.version)
 
     def _parse_block(self, phid, transaction):
         blocker = self._get_blocker(phid)
