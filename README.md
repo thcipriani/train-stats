@@ -47,247 +47,107 @@ SELECT
     rollbacks,
     rollbacks_time,
     patches,
-    group0_delay_days,
-    group1_delay_days,
     group2_delay_days,
     (group0_delay_days +
      group1_delay_days +
      group2_delay_days) as total_delay,
     total_time as train_total_time,
-    comments,
-    insertions,
-    deletions,
-    time_in_review,
-    loc,
-    patch_deps,
-    link,
-    (select count(*) from file f where f.patch_id = p.id) as file_count
+    (select sum(time_in_review) from patch p where p.train_id = t.id) as time_in_review,
+    (select sum(comments) from patch where patch.train_id = t.id) as comments,
+    (select count(*) from blocker b where b.train_id = t.id and resolved = 1) as blockers
 FROM train t
-JOIN patch p ON p.train_id = t.id
 ''', engine)
 
 # Makes your data 538% better...I think
 plt.style.use('fivethirtyeight')
-```
-
-# 🧐 Preliminary thinking
-
-thinking....
-
-Looking at the dataset desribed below it mostly looks correct. I note that the max of the `group[N]_delay_days` is `6` for every day and I'm doing some `N % 7` math somewhere on `.isoweekday()` so that's probably under-reporting. Overall the data looks ok. 👌
-
-# 📑 Aggregation
-
-There is 1×`csv`/train and each row is a patch that went out with that train. Information that is true for an **entire train** (like the _number of patches_, the _number of rollbacks_, the _train conductor_, etc) is **repeated** for every row. The data in the `csv` files is not normalized. It's like a "left join".
-
-We need to aggregate differently per column. Some columns should be the `max`, others should be `sum`med.
-
-
-```python
-# from scipy import stats
-import numpy
-
-def count_outliers(x):
-    return len(x[x > df[x.name].quantile(0.95)])
-
-agg_df = df.groupby('version').agg({
-#    'conductor': lambda x:stats.mode(x)[0],  # I don't know that I care about this…keeping it here to save me from looking at StackOverflow®™©
-    'rollbacks': 'max',
-    'comments': 'sum',
-    'insertions': 'sum',
-    'deletions': 'sum',
-    'loc': ['sum', count_outliers],
-    'patches': 'sum',
-    'time_in_review': ['sum', count_outliers],
-    'patches': ['max', count_outliers],
-    'rollbacks_time': 'max',
-    'total_delay': 'max',
-    'train_total_time': 'max',
-    'file_count': ['sum', count_outliers],
-    'patch_deps': ['sum', count_outliers],
-})
-agg_df.head()
+df.head()
 ```
 
 
 
 
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead tr th {
-        text-align: left;
-    }
-
-    .dataframe thead tr:last-of-type th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
-    <tr>
+    <tr style="text-align: right;">
       <th></th>
+      <th>version</th>
       <th>rollbacks</th>
-      <th>comments</th>
-      <th>insertions</th>
-      <th>deletions</th>
-      <th colspan="2" halign="left">loc</th>
-      <th colspan="2" halign="left">patches</th>
-      <th colspan="2" halign="left">time_in_review</th>
       <th>rollbacks_time</th>
+      <th>patches</th>
+      <th>group2_delay_days</th>
       <th>total_delay</th>
       <th>train_total_time</th>
-      <th colspan="2" halign="left">file_count</th>
-      <th colspan="2" halign="left">patch_deps</th>
-    </tr>
-    <tr>
-      <th></th>
-      <th>max</th>
-      <th>sum</th>
-      <th>sum</th>
-      <th>sum</th>
-      <th>sum</th>
-      <th>count_outliers</th>
-      <th>max</th>
-      <th>count_outliers</th>
-      <th>sum</th>
-      <th>count_outliers</th>
-      <th>max</th>
-      <th>max</th>
-      <th>max</th>
-      <th>sum</th>
-      <th>count_outliers</th>
-      <th>sum</th>
-      <th>count_outliers</th>
-    </tr>
-    <tr>
-      <th>version</th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
+      <th>time_in_review</th>
+      <th>comments</th>
+      <th>blockers</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <th>1.31.0-wmf.1</th>
-      <td>0</td>
-      <td>1416</td>
-      <td>6364</td>
-      <td>4758</td>
-      <td>11122</td>
-      <td>2</td>
-      <td>399</td>
-      <td>0</td>
-      <td>243846663</td>
-      <td>14</td>
+      <th>0</th>
+      <td>1.37.0-wmf.1</td>
       <td>0</td>
       <td>0</td>
-      <td>180742</td>
-      <td>1072</td>
-      <td>13</td>
-      <td>128</td>
-      <td>2</td>
+      <td>450</td>
+      <td>0</td>
+      <td>0</td>
+      <td>178349</td>
+      <td>376214457</td>
+      <td>1175</td>
+      <td>3</td>
     </tr>
     <tr>
-      <th>1.31.0-wmf.11</th>
+      <th>1</th>
+      <td>1.37.0-wmf.3</td>
+      <td>3</td>
+      <td>94493</td>
+      <td>366</td>
+      <td>0</td>
       <td>1</td>
-      <td>1799</td>
-      <td>77419</td>
-      <td>68374</td>
-      <td>145793</td>
-      <td>8</td>
-      <td>335</td>
-      <td>0</td>
-      <td>222575732</td>
-      <td>8</td>
-      <td>5833</td>
-      <td>0</td>
-      <td>173546</td>
-      <td>1109</td>
-      <td>15</td>
-      <td>425</td>
-      <td>37</td>
-    </tr>
-    <tr>
-      <th>1.31.0-wmf.12</th>
-      <td>0</td>
-      <td>1307</td>
-      <td>8200</td>
-      <td>4387</td>
-      <td>12587</td>
-      <td>4</td>
-      <td>374</td>
-      <td>0</td>
-      <td>102222853</td>
-      <td>5</td>
-      <td>0</td>
-      <td>0</td>
-      <td>187456</td>
-      <td>797</td>
+      <td>219880</td>
+      <td>381894655</td>
+      <td>1263</td>
       <td>6</td>
-      <td>160</td>
-      <td>9</td>
     </tr>
     <tr>
-      <th>1.31.0-wmf.15</th>
-      <td>0</td>
-      <td>3887</td>
-      <td>42063</td>
-      <td>31584</td>
-      <td>73647</td>
-      <td>23</td>
-      <td>756</td>
-      <td>0</td>
-      <td>554129449</td>
-      <td>21</td>
-      <td>0</td>
-      <td>0</td>
-      <td>188190</td>
-      <td>2668</td>
-      <td>30</td>
-      <td>469</td>
-      <td>29</td>
-    </tr>
-    <tr>
-      <th>1.31.0-wmf.16</th>
+      <th>2</th>
+      <td>1.37.0-wmf.4</td>
       <td>1</td>
-      <td>1708</td>
-      <td>13006</td>
-      <td>8376</td>
-      <td>21382</td>
+      <td>66812</td>
+      <td>422</td>
+      <td>1</td>
+      <td>3</td>
+      <td>263742</td>
+      <td>328555632</td>
+      <td>1341</td>
       <td>4</td>
-      <td>288</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1.36.0-wmf.1</td>
       <td>0</td>
-      <td>184008614</td>
-      <td>16</td>
-      <td>431612</td>
-      <td>12</td>
-      <td>562921</td>
-      <td>1999</td>
-      <td>22</td>
-      <td>150</td>
-      <td>8</td>
+      <td>0</td>
+      <td>566</td>
+      <td>4</td>
+      <td>4</td>
+      <td>519622</td>
+      <td>305598768</td>
+      <td>1113</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1.36.0-wmf.2</td>
+      <td>4</td>
+      <td>389769</td>
+      <td>273</td>
+      <td>4</td>
+      <td>5</td>
+      <td>554704</td>
+      <td>283073424</td>
+      <td>899</td>
+      <td>1</td>
     </tr>
   </tbody>
 </table>
@@ -295,16 +155,10 @@ agg_df.head()
 
 
 
-## I _think_ ☝️ looks 🌠
-
-…carrying on then.
-
-Below is the correlation between all the numeric data in our set.
-
 
 ```python
 fig, ax = plt.subplots(figsize=(10,10))         # Sample figsize in inches
-sns.heatmap(agg_df.corr(), annot=True, cmap="YlGnBu", linewidths=0.3, annot_kws={"size": 8}, ax=ax)
+sns.heatmap(df.corr(), annot=True, cmap="YlGnBu", linewidths=0.3, annot_kws={"size": 8}, ax=ax)
 plt.xticks(rotation=90)
 plt.yticks(rotation=0)
 plt.show()
@@ -312,125 +166,504 @@ plt.show()
 
 
     
-![png](README_files/README_7_0.png)
+![png](README_files/README_2_0.png)
     
 
 
 
 ```python
-from IPython.display import display
-
-patch_df = pd.read_sql('''
-    select
-        t.version,
-        filename,
-        count(f.filename) as filename_count
-    from file f
-    join patch p on f.patch_id = p.id
-    join train t on t.id = p.train_id
-    group by filename, t.version
-    order by filename_count desc;''', engine)
-display(patch_df[patch_df['version'] == '1.37.0-wmf.3'])
+df.set_index('version')['blockers'].hist(figsize=(12, 10))
+plt.xlabel("Blockers", labelpad=15)
+plt.ylabel("Trains", labelpad=15)
+plt.title("Blockers by Train", y=1.02, fontsize=22);
 ```
 
 
+    
+![png](README_files/README_3_0.png)
+    
+
+
+
+```python
+df[df['blockers'] > 5].sort_values(by='blockers', ascending=False)
+```
+
+
+
+
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
       <th></th>
       <th>version</th>
-      <th>filename</th>
-      <th>filename_count</th>
+      <th>rollbacks</th>
+      <th>rollbacks_time</th>
+      <th>patches</th>
+      <th>group2_delay_days</th>
+      <th>total_delay</th>
+      <th>train_total_time</th>
+      <th>time_in_review</th>
+      <th>comments</th>
+      <th>blockers</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <th>174</th>
-      <td>1.37.0-wmf.3</td>
-      <td>extension.json</td>
-      <td>35</td>
-    </tr>
-    <tr>
-      <th>302</th>
-      <td>1.37.0-wmf.3</td>
-      <td>repo/includes/WikibaseRepo.php</td>
-      <td>23</td>
-    </tr>
-    <tr>
-      <th>469</th>
-      <td>1.37.0-wmf.3</td>
-      <td>RELEASE-NOTES-1.37</td>
-      <td>15</td>
-    </tr>
-    <tr>
-      <th>590</th>
-      <td>1.37.0-wmf.3</td>
-      <td>composer.json</td>
-      <td>13</td>
-    </tr>
-    <tr>
-      <th>666</th>
-      <td>1.37.0-wmf.3</td>
-      <td>i18n/en.json</td>
+      <th>136</th>
+      <td>1.31.0-wmf.20</td>
+      <td>2</td>
+      <td>134534</td>
+      <td>822</td>
+      <td>1</td>
+      <td>5</td>
+      <td>255075</td>
+      <td>944016896</td>
+      <td>4330</td>
       <td>12</td>
     </tr>
     <tr>
-      <th>...</th>
-      <td>...</td>
-      <td>...</td>
-      <td>...</td>
+      <th>103</th>
+      <td>1.33.0-wmf.22</td>
+      <td>0</td>
+      <td>0</td>
+      <td>391</td>
+      <td>0</td>
+      <td>1</td>
+      <td>63844</td>
+      <td>617659650</td>
+      <td>1608</td>
+      <td>11</td>
     </tr>
     <tr>
-      <th>197036</th>
-      <td>1.37.0-wmf.3</td>
-      <td>wikimedia/remex-html/RemexHtml/DOM/DOMBuilder.php</td>
+      <th>82</th>
+      <td>1.34.0-wmf.20</td>
       <td>1</td>
+      <td>16897</td>
+      <td>413</td>
+      <td>5</td>
+      <td>5</td>
+      <td>600096</td>
+      <td>319451631</td>
+      <td>1008</td>
+      <td>11</td>
     </tr>
     <tr>
-      <th>197045</th>
-      <td>1.37.0-wmf.3</td>
-      <td>wikimedia/remex-html/RemexHtml/GenerateDataFil...</td>
+      <th>135</th>
+      <td>1.31.0-wmf.16</td>
       <td>1</td>
+      <td>431612</td>
+      <td>288</td>
+      <td>5</td>
+      <td>12</td>
+      <td>562921</td>
+      <td>184008614</td>
+      <td>1708</td>
+      <td>9</td>
     </tr>
     <tr>
-      <th>197402</th>
-      <td>1.37.0-wmf.3</td>
-      <td>wikimedia/zest-css/CHANGELOG.md</td>
+      <th>76</th>
+      <td>1.34.0-wmf.13</td>
+      <td>2</td>
+      <td>14912</td>
+      <td>471</td>
+      <td>0</td>
       <td>1</td>
+      <td>183853</td>
+      <td>524649491</td>
+      <td>1545</td>
+      <td>8</td>
     </tr>
     <tr>
-      <th>197410</th>
-      <td>1.37.0-wmf.3</td>
-      <td>wikimedia/zest-css/src/Zest.php</td>
+      <th>88</th>
+      <td>1.33.0-wmf.1</td>
+      <td>3</td>
+      <td>103185</td>
+      <td>237</td>
+      <td>0</td>
       <td>1</td>
+      <td>174970</td>
+      <td>259176121</td>
+      <td>888</td>
+      <td>7</td>
     </tr>
     <tr>
-      <th>197416</th>
-      <td>1.37.0-wmf.3</td>
-      <td>wikimedia/zest-css/src/ZestInst.php</td>
+      <th>127</th>
+      <td>1.32.0-wmf.26</td>
+      <td>3</td>
+      <td>95057</td>
+      <td>673</td>
+      <td>0</td>
+      <td>2</td>
+      <td>174156</td>
+      <td>685559052</td>
+      <td>2194</td>
+      <td>7</td>
+    </tr>
+    <tr>
+      <th>124</th>
+      <td>1.32.0-wmf.22</td>
+      <td>0</td>
+      <td>0</td>
+      <td>824</td>
+      <td>0</td>
+      <td>0</td>
+      <td>173055</td>
+      <td>538417283</td>
+      <td>2283</td>
+      <td>7</td>
+    </tr>
+    <tr>
+      <th>111</th>
+      <td>1.32.0-wmf.5</td>
+      <td>0</td>
+      <td>0</td>
+      <td>236</td>
+      <td>5</td>
+      <td>5</td>
+      <td>607929</td>
+      <td>390841864</td>
+      <td>912</td>
+      <td>7</td>
+    </tr>
+    <tr>
+      <th>105</th>
+      <td>1.33.0-wmf.24</td>
+      <td>4</td>
+      <td>385068</td>
+      <td>314</td>
+      <td>4</td>
+      <td>9</td>
+      <td>520660</td>
+      <td>193963293</td>
+      <td>1224</td>
+      <td>7</td>
+    </tr>
+    <tr>
+      <th>147</th>
+      <td>1.37.0-wmf.5</td>
+      <td>2</td>
+      <td>97716</td>
+      <td>505</td>
+      <td>4</td>
+      <td>5</td>
+      <td>519102</td>
+      <td>195305554</td>
+      <td>1170</td>
+      <td>7</td>
+    </tr>
+    <tr>
+      <th>31</th>
+      <td>1.36.0-wmf.36</td>
+      <td>3</td>
+      <td>309874</td>
+      <td>420</td>
+      <td>5</td>
+      <td>10</td>
+      <td>582456</td>
+      <td>403604393</td>
+      <td>1331</td>
+      <td>7</td>
+    </tr>
+    <tr>
+      <th>77</th>
+      <td>1.34.0-wmf.14</td>
+      <td>2</td>
+      <td>412678</td>
+      <td>646</td>
+      <td>4</td>
+      <td>5</td>
+      <td>524983</td>
+      <td>457620082</td>
+      <td>1465</td>
+      <td>7</td>
+    </tr>
+    <tr>
+      <th>59</th>
+      <td>1.35.0-wmf.34</td>
+      <td>2</td>
+      <td>84051</td>
+      <td>699</td>
+      <td>0</td>
       <td>1</td>
+      <td>182933</td>
+      <td>559488478</td>
+      <td>2165</td>
+      <td>7</td>
+    </tr>
+    <tr>
+      <th>57</th>
+      <td>1.35.0-wmf.31</td>
+      <td>3</td>
+      <td>365118</td>
+      <td>427</td>
+      <td>4</td>
+      <td>15</td>
+      <td>516489</td>
+      <td>596337063</td>
+      <td>1674</td>
+      <td>7</td>
+    </tr>
+    <tr>
+      <th>91</th>
+      <td>1.33.0-wmf.6</td>
+      <td>2</td>
+      <td>106815</td>
+      <td>654</td>
+      <td>0</td>
+      <td>0</td>
+      <td>195180</td>
+      <td>421847558</td>
+      <td>1672</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <th>92</th>
+      <td>1.33.0-wmf.8</td>
+      <td>1</td>
+      <td>8082</td>
+      <td>559</td>
+      <td>0</td>
+      <td>0</td>
+      <td>172189</td>
+      <td>381110924</td>
+      <td>1621</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <th>81</th>
+      <td>1.34.0-wmf.19</td>
+      <td>0</td>
+      <td>0</td>
+      <td>422</td>
+      <td>0</td>
+      <td>0</td>
+      <td>171431</td>
+      <td>392750933</td>
+      <td>1355</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <th>51</th>
+      <td>1.35.0-wmf.24</td>
+      <td>1</td>
+      <td>15506</td>
+      <td>518</td>
+      <td>0</td>
+      <td>2</td>
+      <td>102120</td>
+      <td>466568905</td>
+      <td>1714</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <th>46</th>
+      <td>1.35.0-wmf.19</td>
+      <td>1</td>
+      <td>420799</td>
+      <td>348</td>
+      <td>5</td>
+      <td>5</td>
+      <td>593976</td>
+      <td>649089417</td>
+      <td>1190</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1.37.0-wmf.3</td>
+      <td>3</td>
+      <td>94493</td>
+      <td>366</td>
+      <td>0</td>
+      <td>1</td>
+      <td>219880</td>
+      <td>381894655</td>
+      <td>1263</td>
+      <td>6</td>
     </tr>
   </tbody>
 </table>
-<p>1261 rows × 3 columns</p>
 </div>
 
 
 
+
 ```python
+block_df = pd.read_sql('''
+SELECT
+    version,
+    group_blocked
+FROM train t
+JOIN blocker b ON t.id = b.train_id
+''', engine)
+block_df.head()
+```
+
+
+
+
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>version</th>
+      <th>group_blocked</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1.37.0-wmf.7</td>
+      <td>-1</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1.37.0-wmf.7</td>
+      <td>-1</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1.37.0-wmf.12</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1.37.0-wmf.12</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1.37.0-wmf.12</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+block_df.group_blocked.unique()
+```
+
+
+
+
+    array([-1,  2,  1,  0])
+
+
+
+
+```python
+group_name_map = {
+    -1: "Earlier",
+    0: "Group0",
+    1: "Group1",
+    2: "Group2",
+}
+block_df['blocker_added'] = block_df.group_blocked.map(group_name_map)
+block_df.head()
+```
+
+
+
+
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>version</th>
+      <th>group_blocked</th>
+      <th>blocker_added</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1.37.0-wmf.7</td>
+      <td>-1</td>
+      <td>Earlier</td>
+    </tr>
+    <tr>
+      <th>176</th>
+      <td>1.36.0-wmf.35</td>
+      <td>-1</td>
+      <td>Earlier</td>
+    </tr>
+    <tr>
+      <th>177</th>
+      <td>1.36.0-wmf.35</td>
+      <td>-1</td>
+      <td>Earlier</td>
+    </tr>
+    <tr>
+      <th>178</th>
+      <td>1.36.0-wmf.35</td>
+      <td>-1</td>
+      <td>Earlier</td>
+    </tr>
+    <tr>
+      <th>179</th>
+      <td>1.36.0-wmf.35</td>
+      <td>-1</td>
+      <td>Earlier</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+block_df.group_blocked.value_counts()
+```
+
+
+
+
+    -1    233
+     1    230
+     0    180
+     2     91
+    Name: group_blocked, dtype: int64
+
+
+
+
+```python
+block_df.set_index('version')
+block_df.sort_values('group_blocked', inplace=True)
+
+
+fig = plt.figure(figsize=(16,6))
+plt.grid(color='white', lw=0.5, axis='x')
+n, bins, patches = plt.hist(block_df.blocker_added, bins=4, rwidth=0.95)
+
+xticks = [(bins[idx+1] + value)/2 for idx, value in enumerate(bins[:-1])]
+xticks_labels = [ "{:.2f}\nto\n{:.2f}".format(value, bins[idx+1]) for idx, value in enumerate(bins[:-1])]
+plt.xticks(xticks, labels=["Before group0", "Group0", "Group1", "Group2"])
+
+# remove y ticks
+plt.yticks([])
+
+# plot values on top of bars
+for idx, value in enumerate(n):
+    if value > 0:
+        plt.text(xticks[idx], value+5, int(value), ha='center')
+
+plt.title('Histogram of Train Blockers by Group Where Discovered', loc='left', pad=30)
+plt.show()
 
 ```
+
+
+    
+![png](README_files/README_9_0.png)
+    
+
