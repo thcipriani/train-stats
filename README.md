@@ -187,13 +187,19 @@ plt.show()
 ```python
 df.set_index('version')['blockers'].hist(figsize=(12, 10))
 plt.xlabel("Blockers", labelpad=15)
-plt.ylabel("Trains", labelpad=15)
-plt.title("Blockers by Train", y=1.02, fontsize=22);
+plt.title("Blockers per Train", y=1.02, fontsize=22)
 ```
 
 
+
+
+    Text(0.5, 1.02, 'Blockers per Train')
+
+
+
+
     
-![png](README_files/README_3_0.png)
+![png](README_files/README_3_1.png)
     
 
 
@@ -689,6 +695,29 @@ block_df.group_blocked.value_counts()
 
 
 ```python
+block_df.version
+```
+
+
+
+
+    0       1.37.0-wmf.7
+    6       1.37.0-wmf.1
+    672     1.31.0-wmf.2
+    671     1.31.0-wmf.2
+    666    1.32.0-wmf.26
+               ...      
+    334    1.35.0-wmf.41
+    194    1.36.0-wmf.37
+    530    1.33.0-wmf.20
+    185    1.36.0-wmf.36
+    425    1.34.0-wmf.16
+    Name: version, Length: 734, dtype: object
+
+
+
+
+```python
 block_df.set_index('version')
 block_df.sort_values('group_blocked', inplace=True)
 
@@ -716,6 +745,6 @@ plt.show()
 
 
     
-![png](README_files/README_9_0.png)
+![png](README_files/README_10_0.png)
     
 
