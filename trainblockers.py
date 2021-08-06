@@ -7,6 +7,7 @@ import utils
 import git
 
 from phabricator import Phabricator
+from phabricator import APIError
 
 
 def new_trainblockers(version):
@@ -100,10 +101,14 @@ class TrainBlocker(object):
         See comment for 'blocked'
         """
         if not self.unblocker_name:
-            self.unblocker_name = get_phab_user(
-                self.task['fields']['closerPHID'], self.phab)
-            if self.unblocker_name is None:
+            try:
+                self.unblocker_name = get_phab_user(
+                    self.task['fields']['closerPHID'], self.phab)
+                if self.unblocker_name is None:
+                    self.unblocker_name = 'null'
+            except APIError:
                 self.unblocker_name = 'null'
+
         return self.unblocker_name
 
     @property
