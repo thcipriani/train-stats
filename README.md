@@ -39,22 +39,23 @@ from matplotlib import pyplot as plt
 import seaborn as sns
 
 from sqlalchemy import create_engine
-
+    
 engine = create_engine('sqlite:///data/train.db')
 df = pd.read_sql('''
 SELECT
     version,
     rollbacks,
     rollbacks_time,
-    patches,
     group2_delay_days,
     (group0_delay_days +
      group1_delay_days +
      group2_delay_days) as total_delay,
     total_time as train_total_time,
-    (select sum(time_in_review) from patch p where p.train_id = t.id) as time_in_review,
-    (select sum(comments) from patch where patch.train_id = t.id) as comments,
-    (select count(*) from blocker b where b.train_id = t.id and resolved = 1) as blockers
+    (select count(*) from blocker b where b.train_id = t.id and resolved = 1) as blockers,
+    patches,
+    (select max(time_in_review) from patch p where p.train_id = t.id) as max_time_in_review,
+    (select max(comments) from patch where patch.train_id = t.id) as max_comments_per_patch,
+    (select max(start_time - created) from patch p where p.train_id = t.id) as max_cycle_time
 FROM train t
 ''', engine)
 
@@ -67,6 +68,19 @@ df.head()
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -74,13 +88,14 @@ df.head()
       <th>version</th>
       <th>rollbacks</th>
       <th>rollbacks_time</th>
-      <th>patches</th>
       <th>group2_delay_days</th>
       <th>total_delay</th>
       <th>train_total_time</th>
-      <th>time_in_review</th>
-      <th>comments</th>
       <th>blockers</th>
+      <th>patches</th>
+      <th>max_time_in_review</th>
+      <th>max_comments_per_patch</th>
+      <th>max_cycle_time</th>
     </tr>
   </thead>
   <tbody>
@@ -89,65 +104,70 @@ df.head()
       <td>1.37.0-wmf.1</td>
       <td>0</td>
       <td>0</td>
-      <td>450</td>
       <td>0</td>
       <td>0</td>
       <td>178349</td>
-      <td>376214457</td>
-      <td>1175</td>
       <td>3</td>
+      <td>450</td>
+      <td>36809044</td>
+      <td>27</td>
+      <td>36952873</td>
     </tr>
     <tr>
       <th>1</th>
       <td>1.37.0-wmf.3</td>
       <td>3</td>
       <td>94493</td>
-      <td>366</td>
       <td>0</td>
       <td>1</td>
       <td>219880</td>
-      <td>381894655</td>
-      <td>1263</td>
       <td>6</td>
+      <td>366</td>
+      <td>56122286</td>
+      <td>30</td>
+      <td>56562620</td>
     </tr>
     <tr>
       <th>2</th>
       <td>1.37.0-wmf.4</td>
       <td>1</td>
       <td>66812</td>
-      <td>422</td>
       <td>1</td>
       <td>3</td>
       <td>263742</td>
-      <td>328555632</td>
-      <td>1341</td>
       <td>4</td>
+      <td>422</td>
+      <td>38820872</td>
+      <td>29</td>
+      <td>38982601</td>
     </tr>
     <tr>
       <th>3</th>
       <td>1.36.0-wmf.1</td>
       <td>0</td>
       <td>0</td>
-      <td>566</td>
       <td>4</td>
       <td>4</td>
       <td>519622</td>
-      <td>305598768</td>
-      <td>1113</td>
       <td>1</td>
+      <td>566</td>
+      <td>47181045</td>
+      <td>31</td>
+      <td>47755190</td>
     </tr>
     <tr>
       <th>4</th>
       <td>1.36.0-wmf.2</td>
       <td>4</td>
       <td>389769</td>
-      <td>273</td>
       <td>4</td>
       <td>5</td>
       <td>554704</td>
-      <td>283073424</td>
-      <td>899</td>
       <td>1</td>
+      <td>273</td>
+      <td>110996452</td>
+      <td>33</td>
+      <td>111569626</td>
     </tr>
   </tbody>
 </table>
@@ -199,6 +219,19 @@ df[df['blockers'] > 5].sort_values(by='blockers', ascending=False)
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -511,6 +544,19 @@ block_df.head()
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -579,6 +625,19 @@ block_df.head()
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
