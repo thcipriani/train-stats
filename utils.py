@@ -19,6 +19,11 @@ def parse_args():
         help='Show rollbacks'
     )
     ap.add_argument(
+        '--only-start-time',
+        action='store_true',
+        help='only insert train start time'
+    )
+    ap.add_argument(
         '--only-blockers',
         action='store_true',
         help='only insert blockers'

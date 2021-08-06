@@ -260,6 +260,16 @@ def count_rollbacks(version, changes):
             rollbacks += 1
     return rollbacks
 
+
+def get_starttime(version, changes):
+    starttime = float('inf')
+    for change in changes:
+        if change['rollforward']:
+            if change['commit_date'] < starttime:
+                starttime = change['commit_date']
+    return starttime
+
+
 def total_train_time(version, changes):
     roll_forwards = [x for x in changes if x['rollforward']]
     sorted_commits = sorted(roll_forwards, key=lambda x: x['commit_date'])
@@ -337,7 +347,8 @@ def setup_db():
             group0_delay_days INTEGER NOT NULL,
             group1_delay_days INTEGER NOT NULL,
             group2_delay_days INTEGER NOT NULL,
-            total_time INTEGER NOT NULL
+            total_time INTEGER NOT NULL,
+            start_time INTEGER NOT NULL
         );
     ''')
     crs.execute('''
@@ -369,16 +380,16 @@ def setup_db():
             id INTEGER PRIMARY KEY,
             train_id INTEGER NOT NULL,
             blocked INTEGER NOT NULL,
-            unblocked INTEGER NOT NULL,
+            unblocked INTEGER,
             blocker TEXT NOT NULL,
-            unblocker TEXT NOT NULL,
+            unblocker TEXT,
             removed INTEGER NOT NULL,
             resolved INTEGER NOT NULL,
             task INTEGER NOT NULL,
             url TEXT NOT NULL,
             status TEXT NOT NULL,
             group_blocked INTEGER NOT NULL,
-            group_unblocked INTEGER NOT NULL,
+            group_unblocked INTEGER,
             CHECK (removed IN (0, 1))
             CHECK (resolved IN (0, 1))
             UNIQUE(train_id,blocked,task)
@@ -402,6 +413,21 @@ if __name__ == '__main__':
         if wikiversion_changes is None:
             raise RuntimeError(f'{version} was never deployed!')
 
+        start_time = get_starttime(version, wikiversion_changes)
+
+        if args.only_start_time:
+            print(f'START TIME: {start_time}')
+            crs.execute('''
+                UPDATE train
+                SET start_time = ?
+                WHERE version = ?''', (
+                    start_time,
+                    version
+                )
+            )
+            conn.commit()
+            sys.exit(0)
+
         rollbacks = count_rollbacks(version, wikiversion_changes)
         conductor = get_conductor(version, wikiversion_changes)
         rollbacks_time = time_rolledback(version, wikiversion_changes)
@@ -412,6 +438,7 @@ if __name__ == '__main__':
 
         # Don't touch data, just print and exit
         if args.show_rollbacks:
+            print(f'START TIME: {start_time}')
             print(f'CONDUCTOR: {conductor}')
             print(f'ROLLBACKS COUNT: {rollbacks}')
             print(f'TIME ROLLEDBACK (seconds): {rollbacks_time}')
@@ -424,6 +451,7 @@ if __name__ == '__main__':
         if not args.only_patches and not args.only_blockers:
             crs.execute('''
                 INSERT INTO train(
+                    start_time,
                     version,
                     conductor,
                     patches,
@@ -433,7 +461,8 @@ if __name__ == '__main__':
                     group1_delay_days,
                     group2_delay_days,
                     total_time)
-                VALUES(?,?,?,?,?,?,?,?,?)''', (
+                VALUES(?,?,?,?,?,?,?,?,?,?)''', (
+                    start_time,
                     version,
                     conductor,
                     patch_count,
