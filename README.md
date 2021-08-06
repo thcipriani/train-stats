@@ -51,7 +51,8 @@ SELECT
      group1_delay_days +
      group2_delay_days) as total_delay,
     total_time as train_total_time,
-    (select count(*) from blocker b where b.train_id = t.id and resolved = 1) as blockers,
+    (select count(*) from blocker b where b.train_id = t.id) as blockers,
+    (select count(*) from blocker b where b.train_id = t.id and resolved = 1) as resolved_blockers,
     patches,
     (select max(time_in_review) from patch p where p.train_id = t.id) as max_time_in_review,
     (select max(comments) from patch where patch.train_id = t.id) as max_comments_per_patch,
@@ -92,6 +93,7 @@ df.head()
       <th>total_delay</th>
       <th>train_total_time</th>
       <th>blockers</th>
+      <th>resolved_blockers</th>
       <th>patches</th>
       <th>max_time_in_review</th>
       <th>max_comments_per_patch</th>
@@ -107,6 +109,7 @@ df.head()
       <td>0</td>
       <td>0</td>
       <td>178349</td>
+      <td>5</td>
       <td>3</td>
       <td>450</td>
       <td>36809044</td>
@@ -121,6 +124,7 @@ df.head()
       <td>0</td>
       <td>1</td>
       <td>219880</td>
+      <td>7</td>
       <td>6</td>
       <td>366</td>
       <td>56122286</td>
@@ -135,6 +139,7 @@ df.head()
       <td>1</td>
       <td>3</td>
       <td>263742</td>
+      <td>9</td>
       <td>4</td>
       <td>422</td>
       <td>38820872</td>
@@ -150,6 +155,7 @@ df.head()
       <td>4</td>
       <td>519622</td>
       <td>1</td>
+      <td>1</td>
       <td>566</td>
       <td>47181045</td>
       <td>31</td>
@@ -163,6 +169,7 @@ df.head()
       <td>4</td>
       <td>5</td>
       <td>554704</td>
+      <td>7</td>
       <td>1</td>
       <td>273</td>
       <td>110996452</td>
@@ -212,7 +219,7 @@ plt.title("Blockers per Train", y=1.02, fontsize=22)
 
 
 ```python
-df[df['blockers'] > 5].sort_values(by='blockers', ascending=False)
+df[df['blockers'] > 10].sort_values(by='blockers', ascending=False)
 ```
 
 
@@ -239,288 +246,114 @@ df[df['blockers'] > 5].sort_values(by='blockers', ascending=False)
       <th>version</th>
       <th>rollbacks</th>
       <th>rollbacks_time</th>
-      <th>patches</th>
       <th>group2_delay_days</th>
       <th>total_delay</th>
       <th>train_total_time</th>
-      <th>time_in_review</th>
-      <th>comments</th>
       <th>blockers</th>
+      <th>patches</th>
+      <th>max_time_in_review</th>
+      <th>max_comments_per_patch</th>
+      <th>max_cycle_time</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <th>136</th>
-      <td>1.31.0-wmf.20</td>
-      <td>2</td>
-      <td>134534</td>
-      <td>822</td>
+      <th>82</th>
+      <td>1.34.0-wmf.20</td>
       <td>1</td>
+      <td>16897</td>
       <td>5</td>
-      <td>255075</td>
-      <td>944016896</td>
-      <td>4330</td>
-      <td>12</td>
+      <td>5</td>
+      <td>600096</td>
+      <td>20</td>
+      <td>413</td>
+      <td>60583935</td>
+      <td>37</td>
+      <td>60715205</td>
     </tr>
     <tr>
       <th>103</th>
       <td>1.33.0-wmf.22</td>
       <td>0</td>
       <td>0</td>
-      <td>391</td>
       <td>0</td>
       <td>1</td>
       <td>63844</td>
-      <td>617659650</td>
-      <td>1608</td>
-      <td>11</td>
-    </tr>
-    <tr>
-      <th>82</th>
-      <td>1.34.0-wmf.20</td>
-      <td>1</td>
-      <td>16897</td>
-      <td>413</td>
-      <td>5</td>
-      <td>5</td>
-      <td>600096</td>
-      <td>319451631</td>
-      <td>1008</td>
-      <td>11</td>
-    </tr>
-    <tr>
-      <th>135</th>
-      <td>1.31.0-wmf.16</td>
-      <td>1</td>
-      <td>431612</td>
-      <td>288</td>
-      <td>5</td>
-      <td>12</td>
-      <td>562921</td>
-      <td>184008614</td>
-      <td>1708</td>
-      <td>9</td>
-    </tr>
-    <tr>
-      <th>76</th>
-      <td>1.34.0-wmf.13</td>
-      <td>2</td>
-      <td>14912</td>
-      <td>471</td>
-      <td>0</td>
-      <td>1</td>
-      <td>183853</td>
-      <td>524649491</td>
-      <td>1545</td>
-      <td>8</td>
-    </tr>
-    <tr>
-      <th>88</th>
-      <td>1.33.0-wmf.1</td>
-      <td>3</td>
-      <td>103185</td>
-      <td>237</td>
-      <td>0</td>
-      <td>1</td>
-      <td>174970</td>
-      <td>259176121</td>
-      <td>888</td>
-      <td>7</td>
-    </tr>
-    <tr>
-      <th>127</th>
-      <td>1.32.0-wmf.26</td>
-      <td>3</td>
-      <td>95057</td>
-      <td>673</td>
-      <td>0</td>
-      <td>2</td>
-      <td>174156</td>
-      <td>685559052</td>
-      <td>2194</td>
-      <td>7</td>
-    </tr>
-    <tr>
-      <th>124</th>
-      <td>1.32.0-wmf.22</td>
-      <td>0</td>
-      <td>0</td>
-      <td>824</td>
-      <td>0</td>
-      <td>0</td>
-      <td>173055</td>
-      <td>538417283</td>
-      <td>2283</td>
-      <td>7</td>
-    </tr>
-    <tr>
-      <th>111</th>
-      <td>1.32.0-wmf.5</td>
-      <td>0</td>
-      <td>0</td>
-      <td>236</td>
-      <td>5</td>
-      <td>5</td>
-      <td>607929</td>
-      <td>390841864</td>
-      <td>912</td>
-      <td>7</td>
-    </tr>
-    <tr>
-      <th>105</th>
-      <td>1.33.0-wmf.24</td>
-      <td>4</td>
-      <td>385068</td>
-      <td>314</td>
-      <td>4</td>
-      <td>9</td>
-      <td>520660</td>
-      <td>193963293</td>
-      <td>1224</td>
-      <td>7</td>
-    </tr>
-    <tr>
-      <th>147</th>
-      <td>1.37.0-wmf.5</td>
-      <td>2</td>
-      <td>97716</td>
-      <td>505</td>
-      <td>4</td>
-      <td>5</td>
-      <td>519102</td>
-      <td>195305554</td>
-      <td>1170</td>
-      <td>7</td>
-    </tr>
-    <tr>
-      <th>31</th>
-      <td>1.36.0-wmf.36</td>
-      <td>3</td>
-      <td>309874</td>
-      <td>420</td>
-      <td>5</td>
-      <td>10</td>
-      <td>582456</td>
-      <td>403604393</td>
-      <td>1331</td>
-      <td>7</td>
+      <td>17</td>
+      <td>391</td>
+      <td>107411197</td>
+      <td>45</td>
+      <td>107659715</td>
     </tr>
     <tr>
       <th>77</th>
       <td>1.34.0-wmf.14</td>
       <td>2</td>
       <td>412678</td>
-      <td>646</td>
       <td>4</td>
       <td>5</td>
       <td>524983</td>
-      <td>457620082</td>
-      <td>1465</td>
-      <td>7</td>
+      <td>16</td>
+      <td>646</td>
+      <td>73502579</td>
+      <td>34</td>
+      <td>73539481</td>
     </tr>
     <tr>
-      <th>59</th>
-      <td>1.35.0-wmf.34</td>
+      <th>136</th>
+      <td>1.31.0-wmf.20</td>
       <td>2</td>
-      <td>84051</td>
-      <td>699</td>
-      <td>0</td>
+      <td>134534</td>
       <td>1</td>
-      <td>182933</td>
-      <td>559488478</td>
-      <td>2165</td>
-      <td>7</td>
+      <td>5</td>
+      <td>255075</td>
+      <td>14</td>
+      <td>822</td>
+      <td>66099647</td>
+      <td>75</td>
+      <td>67210868</td>
+    </tr>
+    <tr>
+      <th>124</th>
+      <td>1.32.0-wmf.22</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>173055</td>
+      <td>12</td>
+      <td>824</td>
+      <td>64869761</td>
+      <td>44</td>
+      <td>65392036</td>
     </tr>
     <tr>
       <th>57</th>
       <td>1.35.0-wmf.31</td>
       <td>3</td>
       <td>365118</td>
-      <td>427</td>
       <td>4</td>
       <td>15</td>
       <td>516489</td>
-      <td>596337063</td>
-      <td>1674</td>
-      <td>7</td>
+      <td>11</td>
+      <td>427</td>
+      <td>72215548</td>
+      <td>70</td>
+      <td>72206585</td>
     </tr>
     <tr>
-      <th>91</th>
-      <td>1.33.0-wmf.6</td>
+      <th>76</th>
+      <td>1.34.0-wmf.13</td>
       <td>2</td>
-      <td>106815</td>
-      <td>654</td>
-      <td>0</td>
-      <td>0</td>
-      <td>195180</td>
-      <td>421847558</td>
-      <td>1672</td>
-      <td>6</td>
-    </tr>
-    <tr>
-      <th>92</th>
-      <td>1.33.0-wmf.8</td>
-      <td>1</td>
-      <td>8082</td>
-      <td>559</td>
-      <td>0</td>
-      <td>0</td>
-      <td>172189</td>
-      <td>381110924</td>
-      <td>1621</td>
-      <td>6</td>
-    </tr>
-    <tr>
-      <th>81</th>
-      <td>1.34.0-wmf.19</td>
-      <td>0</td>
-      <td>0</td>
-      <td>422</td>
-      <td>0</td>
-      <td>0</td>
-      <td>171431</td>
-      <td>392750933</td>
-      <td>1355</td>
-      <td>6</td>
-    </tr>
-    <tr>
-      <th>51</th>
-      <td>1.35.0-wmf.24</td>
-      <td>1</td>
-      <td>15506</td>
-      <td>518</td>
-      <td>0</td>
-      <td>2</td>
-      <td>102120</td>
-      <td>466568905</td>
-      <td>1714</td>
-      <td>6</td>
-    </tr>
-    <tr>
-      <th>46</th>
-      <td>1.35.0-wmf.19</td>
-      <td>1</td>
-      <td>420799</td>
-      <td>348</td>
-      <td>5</td>
-      <td>5</td>
-      <td>593976</td>
-      <td>649089417</td>
-      <td>1190</td>
-      <td>6</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>1.37.0-wmf.3</td>
-      <td>3</td>
-      <td>94493</td>
-      <td>366</td>
+      <td>14912</td>
       <td>0</td>
       <td>1</td>
-      <td>219880</td>
-      <td>381894655</td>
-      <td>1263</td>
-      <td>6</td>
+      <td>183853</td>
+      <td>11</td>
+      <td>471</td>
+      <td>53208155</td>
+      <td>23</td>
+      <td>53820019</td>
     </tr>
   </tbody>
 </table>
@@ -655,28 +488,28 @@ block_df.head()
       <td>Earlier</td>
     </tr>
     <tr>
-      <th>176</th>
-      <td>1.36.0-wmf.35</td>
+      <th>1</th>
+      <td>1.37.0-wmf.7</td>
       <td>-1</td>
       <td>Earlier</td>
     </tr>
     <tr>
-      <th>177</th>
-      <td>1.36.0-wmf.35</td>
-      <td>-1</td>
-      <td>Earlier</td>
+      <th>2</th>
+      <td>1.37.0-wmf.12</td>
+      <td>2</td>
+      <td>Group2</td>
     </tr>
     <tr>
-      <th>178</th>
-      <td>1.36.0-wmf.35</td>
-      <td>-1</td>
-      <td>Earlier</td>
+      <th>3</th>
+      <td>1.37.0-wmf.12</td>
+      <td>1</td>
+      <td>Group1</td>
     </tr>
     <tr>
-      <th>179</th>
-      <td>1.36.0-wmf.35</td>
-      <td>-1</td>
-      <td>Earlier</td>
+      <th>4</th>
+      <td>1.37.0-wmf.12</td>
+      <td>1</td>
+      <td>Group1</td>
     </tr>
   </tbody>
 </table>
@@ -692,10 +525,10 @@ block_df.group_blocked.value_counts()
 
 
 
-    -1    233
-     1    230
+    -1    242
+     1    232
      0    180
-     2     91
+     2     93
     Name: group_blocked, dtype: int64
 
 
@@ -709,17 +542,17 @@ block_df.version
 
 
     0       1.37.0-wmf.7
-    6       1.37.0-wmf.1
-    672     1.31.0-wmf.2
-    671     1.31.0-wmf.2
-    666    1.32.0-wmf.26
+    1       1.37.0-wmf.7
+    2      1.37.0-wmf.12
+    3      1.37.0-wmf.12
+    4      1.37.0-wmf.12
                ...      
-    334    1.35.0-wmf.41
-    194    1.36.0-wmf.37
-    530    1.33.0-wmf.20
-    185    1.36.0-wmf.36
-    425    1.34.0-wmf.16
-    Name: version, Length: 734, dtype: object
+    742    1.37.0-wmf.17
+    743    1.37.0-wmf.17
+    744    1.37.0-wmf.17
+    745    1.37.0-wmf.17
+    746    1.37.0-wmf.17
+    Name: version, Length: 747, dtype: object
 
 
 
@@ -755,3 +588,8 @@ plt.show()
 ![png](README_files/README_10_0.png)
     
 
+
+
+```python
+
+```
