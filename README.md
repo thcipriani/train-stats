@@ -192,9 +192,7 @@ plt.show()
 ```
 
 
-    
 ![png](README_files/README_2_0.png)
-    
 
 
 
@@ -212,9 +210,7 @@ plt.title("Blockers per Train", y=1.02, fontsize=22)
 
 
 
-    
 ![png](README_files/README_3_1.png)
-    
 
 
 
@@ -250,6 +246,7 @@ df[df['blockers'] > 10].sort_values(by='blockers', ascending=False)
       <th>total_delay</th>
       <th>train_total_time</th>
       <th>blockers</th>
+      <th>resolved_blockers</th>
       <th>patches</th>
       <th>max_time_in_review</th>
       <th>max_comments_per_patch</th>
@@ -266,6 +263,7 @@ df[df['blockers'] > 10].sort_values(by='blockers', ascending=False)
       <td>5</td>
       <td>600096</td>
       <td>20</td>
+      <td>11</td>
       <td>413</td>
       <td>60583935</td>
       <td>37</td>
@@ -280,6 +278,7 @@ df[df['blockers'] > 10].sort_values(by='blockers', ascending=False)
       <td>1</td>
       <td>63844</td>
       <td>17</td>
+      <td>11</td>
       <td>391</td>
       <td>107411197</td>
       <td>45</td>
@@ -294,6 +293,7 @@ df[df['blockers'] > 10].sort_values(by='blockers', ascending=False)
       <td>5</td>
       <td>524983</td>
       <td>16</td>
+      <td>7</td>
       <td>646</td>
       <td>73502579</td>
       <td>34</td>
@@ -308,6 +308,7 @@ df[df['blockers'] > 10].sort_values(by='blockers', ascending=False)
       <td>5</td>
       <td>255075</td>
       <td>14</td>
+      <td>12</td>
       <td>822</td>
       <td>66099647</td>
       <td>75</td>
@@ -322,6 +323,7 @@ df[df['blockers'] > 10].sort_values(by='blockers', ascending=False)
       <td>0</td>
       <td>173055</td>
       <td>12</td>
+      <td>7</td>
       <td>824</td>
       <td>64869761</td>
       <td>44</td>
@@ -336,6 +338,7 @@ df[df['blockers'] > 10].sort_values(by='blockers', ascending=False)
       <td>15</td>
       <td>516489</td>
       <td>11</td>
+      <td>7</td>
       <td>427</td>
       <td>72215548</td>
       <td>70</td>
@@ -350,6 +353,7 @@ df[df['blockers'] > 10].sort_values(by='blockers', ascending=False)
       <td>1</td>
       <td>183853</td>
       <td>11</td>
+      <td>8</td>
       <td>471</td>
       <td>53208155</td>
       <td>23</td>
@@ -584,9 +588,218 @@ plt.show()
 ```
 
 
-    
 ![png](README_files/README_10_0.png)
-    
+
+
+
+```python
+patches = pd.read_sql('''
+SELECT
+    link,
+    version,
+    submitted,
+    insertions as ins,
+    (deletions*-1) as del
+FROM patch p JOIN train t ON t.id = p.train_id
+''', engine)
+patches.describe()
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>submitted</th>
+      <th>ins</th>
+      <th>del</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>count</th>
+      <td>6.137000e+04</td>
+      <td>6.137000e+04</td>
+      <td>61370.000000</td>
+    </tr>
+    <tr>
+      <th>mean</th>
+      <td>1.568131e+09</td>
+      <td>4.158584e+02</td>
+      <td>-90.335180</td>
+    </tr>
+    <tr>
+      <th>std</th>
+      <td>3.338680e+07</td>
+      <td>6.985373e+04</td>
+      <td>2949.141918</td>
+    </tr>
+    <tr>
+      <th>min</th>
+      <td>1.431572e+09</td>
+      <td>0.000000e+00</td>
+      <td>-545717.000000</td>
+    </tr>
+    <tr>
+      <th>25%</th>
+      <td>1.539127e+09</td>
+      <td>2.000000e+00</td>
+      <td>-17.000000</td>
+    </tr>
+    <tr>
+      <th>50%</th>
+      <td>1.570179e+09</td>
+      <td>6.000000e+00</td>
+      <td>-4.000000</td>
+    </tr>
+    <tr>
+      <th>75%</th>
+      <td>1.593774e+09</td>
+      <td>3.100000e+01</td>
+      <td>-1.000000</td>
+    </tr>
+    <tr>
+      <th>max</th>
+      <td>1.627979e+09</td>
+      <td>1.728860e+07</td>
+      <td>0.000000</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+patches['loc'] = patches['ins'] + patches['del']
+patches.head()
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>link</th>
+      <th>version</th>
+      <th>submitted</th>
+      <th>ins</th>
+      <th>del</th>
+      <th>loc</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>https://gerrit.wikimedia.org/r/#/q/ccbfcf28,n,z</td>
+      <td>1.37.0-wmf.1</td>
+      <td>1618945759</td>
+      <td>5</td>
+      <td>-1</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>https://gerrit.wikimedia.org/r/#/q/3302274f,n,z</td>
+      <td>1.37.0-wmf.1</td>
+      <td>1618878371</td>
+      <td>1156</td>
+      <td>-660</td>
+      <td>496</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>https://gerrit.wikimedia.org/r/#/q/8b5471b5,n,z</td>
+      <td>1.37.0-wmf.1</td>
+      <td>1618343309</td>
+      <td>976</td>
+      <td>-3</td>
+      <td>973</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>https://gerrit.wikimedia.org/r/#/q/a6abbb67,n,z</td>
+      <td>1.37.0-wmf.1</td>
+      <td>1618341075</td>
+      <td>8</td>
+      <td>-29</td>
+      <td>-21</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>https://gerrit.wikimedia.org/r/#/q/af916aad,n,z</td>
+      <td>1.37.0-wmf.1</td>
+      <td>1618300868</td>
+      <td>7</td>
+      <td>-5</td>
+      <td>2</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+patches['submitted'] = pd.to_datetime(patches['submitted'], unit='s')
+patches.set_index('submitted', inplace=True)
+```
+
+
+```python
+out = patches.groupby(pd.Grouper(freq='M')).apply(lambda x: x)
+out = out[out['link'] != 'https://gerrit.wikimedia.org/r/#/q/9a08dbab,n,z'] # The one patch that inserts 17.2M lines of code
+out['ok'] = out['loc'].cumsum()
+```
+
+
+```python
+out['ok'].plot.line()
+```
+
+
+
+
+    <AxesSubplot:xlabel='submitted'>
+
+
+
+
+![png](README_files/README_15_1.png)
 
 
 
