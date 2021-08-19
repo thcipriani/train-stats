@@ -801,8 +801,8 @@ cycle = pd.read_sql('''
 SELECT
     substr(version, 8) as version,
     datetime(start_time, 'unixepoch'),
-    (start_time - created) as lead_time,
-    (start_time - submitted) as cycle_time,
+    (start_time - created) as cycle_time,
+    (start_time - submitted) as lead_time,
     datetime(created, 'unixepoch'),
     datetime(submitted, 'unixepoch'),
     link
@@ -812,7 +812,6 @@ WHERE (lead_time > 0 AND cycle_time > 0)
         version = '1.37.0-wmf.14' OR
         version = '1.37.0-wmf.15' OR
         version = '1.37.0-wmf.16' OR
-        version = '1.37.0-wmf.17' OR
         version = '1.37.0-wmf.18'
     )
 ''', engine)
@@ -842,8 +841,8 @@ cycle.head()
       <th></th>
       <th>version</th>
       <th>datetime(start_time, 'unixepoch')</th>
-      <th>lead_time</th>
       <th>cycle_time</th>
+      <th>lead_time</th>
       <th>datetime(created, 'unixepoch')</th>
       <th>datetime(submitted, 'unixepoch')</th>
       <th>link</th>
@@ -908,6 +907,102 @@ cycle.head()
 
 
 ```python
+cycle.sort_values(by='lead_time', ascending=False).head()
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>version</th>
+      <th>datetime(start_time, 'unixepoch')</th>
+      <th>cycle_time</th>
+      <th>lead_time</th>
+      <th>datetime(created, 'unixepoch')</th>
+      <th>datetime(submitted, 'unixepoch')</th>
+      <th>link</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>200</th>
+      <td>wmf.15</td>
+      <td>2021-07-21 09:05:07</td>
+      <td>695245</td>
+      <td>691061</td>
+      <td>2021-07-13 07:57:42</td>
+      <td>2021-07-13 09:07:26</td>
+      <td>https://gerrit.wikimedia.org/r/q/704201</td>
+    </tr>
+    <tr>
+      <th>222</th>
+      <td>wmf.15</td>
+      <td>2021-07-21 09:05:07</td>
+      <td>3029693</td>
+      <td>685515</td>
+      <td>2021-06-16 07:30:14</td>
+      <td>2021-07-13 10:39:52</td>
+      <td>https://gerrit.wikimedia.org/r/q/699983</td>
+    </tr>
+    <tr>
+      <th>312</th>
+      <td>wmf.15</td>
+      <td>2021-07-21 09:05:07</td>
+      <td>737791</td>
+      <td>680536</td>
+      <td>2021-07-12 20:08:36</td>
+      <td>2021-07-13 12:02:51</td>
+      <td>https://gerrit.wikimedia.org/r/q/704120</td>
+    </tr>
+    <tr>
+      <th>199</th>
+      <td>wmf.15</td>
+      <td>2021-07-21 09:05:07</td>
+      <td>751533</td>
+      <td>677129</td>
+      <td>2021-07-12 16:19:34</td>
+      <td>2021-07-13 12:59:38</td>
+      <td>https://gerrit.wikimedia.org/r/q/704086</td>
+    </tr>
+    <tr>
+      <th>248</th>
+      <td>wmf.15</td>
+      <td>2021-07-21 09:05:07</td>
+      <td>679780</td>
+      <td>674555</td>
+      <td>2021-07-13 12:15:27</td>
+      <td>2021-07-13 13:42:32</td>
+      <td>https://gerrit.wikimedia.org/r/q/704272</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+### Lead time
+
+The time from commit to deploy (in seconds)
+
+
+```python
 from matplotlib import ticker as mticker
 import numpy as np
 
@@ -916,25 +1011,50 @@ fig, ax = plt.subplots(1, 3, sharey=True, figsize=(20,10))
 sns.violinplot(data=cycle,x='version', y='lead_time', ax=ax[0])
 sns.swarmplot(data=cycle,x='version', y='lead_time', ax=ax[1])
 sns.stripplot(data=cycle,x='version', y='lead_time', ax=ax[2])
-ax[0].yaxis.set_major_formatter(mticker.StrMethodFormatter("$10^{{{x:.0f}}}$"))
+ax[0].yaxis.set_major_formatter(mticker.StrMethodFormatter("{x}"))
 ax[0].yaxis.set_ticks([np.log10(x) for p in range(-6,1) for x in np.linspace(10**p, 10**(p+1), 10)], minor=True)
 plt.show()
 ```
 
-    /usr/lib/python3/dist-packages/seaborn/categorical.py:1296: UserWarning: 79.2% of the points cannot be placed; you may want to decrease the size of the markers or use stripplot.
-      warnings.warn(msg, UserWarning)
-    /usr/lib/python3/dist-packages/seaborn/categorical.py:1296: UserWarning: 79.0% of the points cannot be placed; you may want to decrease the size of the markers or use stripplot.
-      warnings.warn(msg, UserWarning)
-    /usr/lib/python3/dist-packages/seaborn/categorical.py:1296: UserWarning: 90.1% of the points cannot be placed; you may want to decrease the size of the markers or use stripplot.
-      warnings.warn(msg, UserWarning)
-    /usr/lib/python3/dist-packages/seaborn/categorical.py:1296: UserWarning: 79.4% of the points cannot be placed; you may want to decrease the size of the markers or use stripplot.
-      warnings.warn(msg, UserWarning)
-    /usr/lib/python3/dist-packages/seaborn/categorical.py:1296: UserWarning: 79.5% of the points cannot be placed; you may want to decrease the size of the markers or use stripplot.
+    /usr/lib/python3/dist-packages/seaborn/categorical.py:1296: UserWarning: 12.1% of the points cannot be placed; you may want to decrease the size of the markers or use stripplot.
       warnings.warn(msg, UserWarning)
 
 
 
-![png](README_files/README_17_1.png)
+![png](README_files/README_19_1.png)
+
+
+### Cycle time
+
+The time from patchset submission for code review to deploy
+
+
+```python
+from matplotlib import ticker as mticker
+import numpy as np
+
+# Adapted from <https://stackoverflow.com/a/60132262>
+fig, ax = plt.subplots(1, 3, sharey=True, figsize=(20,10))
+sns.violinplot(data=cycle,x='version', y='cycle_time', ax=ax[0])
+sns.swarmplot(data=cycle,x='version', y='cycle_time', ax=ax[1])
+sns.stripplot(data=cycle,x='version', y='cycle_time', ax=ax[2])
+ax[0].yaxis.set_major_formatter(mticker.StrMethodFormatter("{x}"))
+ax[0].yaxis.set_ticks([np.log10(x) for p in range(-6,1) for x in np.linspace(10**p, 10**(p+1), 10)], minor=True)
+plt.show()
+```
+
+    /usr/lib/python3/dist-packages/seaborn/categorical.py:1296: UserWarning: 71.8% of the points cannot be placed; you may want to decrease the size of the markers or use stripplot.
+      warnings.warn(msg, UserWarning)
+    /usr/lib/python3/dist-packages/seaborn/categorical.py:1296: UserWarning: 70.7% of the points cannot be placed; you may want to decrease the size of the markers or use stripplot.
+      warnings.warn(msg, UserWarning)
+    /usr/lib/python3/dist-packages/seaborn/categorical.py:1296: UserWarning: 85.2% of the points cannot be placed; you may want to decrease the size of the markers or use stripplot.
+      warnings.warn(msg, UserWarning)
+    /usr/lib/python3/dist-packages/seaborn/categorical.py:1296: UserWarning: 73.0% of the points cannot be placed; you may want to decrease the size of the markers or use stripplot.
+      warnings.warn(msg, UserWarning)
+
+
+
+![png](README_files/README_21_1.png)
 
 
 
