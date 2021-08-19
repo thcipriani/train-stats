@@ -799,7 +799,7 @@ out['ok'] = out['loc'].cumsum()
 
 cycle = pd.read_sql('''
 SELECT
-    version,
+    substr(version, 8) as version,
     datetime(start_time, 'unixepoch'),
     (start_time - created) as lead_time,
     (start_time - submitted) as cycle_time,
@@ -807,7 +807,14 @@ SELECT
     datetime(submitted, 'unixepoch'),
     link
 FROM patch p JOIN train t ON t.id = p.train_id
-WHERE lead_time > 0 AND cycle_time > 0 AND version = '1.37.0-wmf.16' OR version = '1.37.0-wmf.17' OR version = '1.37.0-wmf.15' OR version = '1.37.0-wmf.14'
+WHERE (lead_time > 0 AND cycle_time > 0)
+    AND (
+        version = '1.37.0-wmf.14' OR
+        version = '1.37.0-wmf.15' OR
+        version = '1.37.0-wmf.16' OR
+        version = '1.37.0-wmf.17' OR
+        version = '1.37.0-wmf.18'
+    )
 ''', engine)
 cycle.head()
 ```
@@ -845,53 +852,53 @@ cycle.head()
   <tbody>
     <tr>
       <th>0</th>
-      <td>1.37.0-wmf.16</td>
-      <td>2021-07-27 19:25:08</td>
-      <td>40679</td>
-      <td>39642</td>
-      <td>2021-07-27 08:07:09</td>
-      <td>2021-07-27 08:24:26</td>
-      <td>https://gerrit.wikimedia.org/r/q/708196</td>
+      <td>wmf.14</td>
+      <td>2021-07-13 22:15:46</td>
+      <td>50935</td>
+      <td>49822</td>
+      <td>2021-07-13 08:06:51</td>
+      <td>2021-07-13 08:25:24</td>
+      <td>https://gerrit.wikimedia.org/r/q/704204</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>1.37.0-wmf.16</td>
-      <td>2021-07-27 19:25:08</td>
-      <td>71489</td>
-      <td>49427</td>
-      <td>2021-07-26 23:33:39</td>
-      <td>2021-07-27 05:41:21</td>
-      <td>https://gerrit.wikimedia.org/r/q/708147</td>
+      <td>wmf.14</td>
+      <td>2021-07-13 22:15:46</td>
+      <td>3619864</td>
+      <td>66729</td>
+      <td>2021-06-02 00:44:42</td>
+      <td>2021-07-13 03:43:37</td>
+      <td>https://gerrit.wikimedia.org/r/q/697641</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>1.37.0-wmf.16</td>
-      <td>2021-07-27 19:25:08</td>
-      <td>372587</td>
-      <td>48983</td>
-      <td>2021-07-23 11:55:21</td>
-      <td>2021-07-27 05:48:45</td>
-      <td>https://gerrit.wikimedia.org/r/q/707010</td>
+      <td>wmf.14</td>
+      <td>2021-07-13 22:15:46</td>
+      <td>113413</td>
+      <td>64290</td>
+      <td>2021-07-12 14:45:33</td>
+      <td>2021-07-13 04:24:16</td>
+      <td>https://gerrit.wikimedia.org/r/q/704070</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>1.37.0-wmf.16</td>
-      <td>2021-07-27 19:25:08</td>
-      <td>2756897</td>
-      <td>82830</td>
-      <td>2021-06-25 21:36:51</td>
-      <td>2021-07-26 20:24:38</td>
-      <td>https://gerrit.wikimedia.org/r/q/701578</td>
+      <td>wmf.14</td>
+      <td>2021-07-13 22:15:46</td>
+      <td>147105</td>
+      <td>57177</td>
+      <td>2021-07-12 05:24:01</td>
+      <td>2021-07-13 06:22:49</td>
+      <td>https://gerrit.wikimedia.org/r/q/703949</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>1.37.0-wmf.16</td>
-      <td>2021-07-27 19:25:08</td>
-      <td>935165</td>
-      <td>84491</td>
-      <td>2021-07-16 23:39:03</td>
-      <td>2021-07-26 19:56:57</td>
-      <td>https://gerrit.wikimedia.org/r/q/705004</td>
+      <td>wmf.14</td>
+      <td>2021-07-13 22:15:46</td>
+      <td>255812</td>
+      <td>115733</td>
+      <td>2021-07-10 23:12:14</td>
+      <td>2021-07-12 14:06:53</td>
+      <td>https://gerrit.wikimedia.org/r/q/703907</td>
     </tr>
   </tbody>
 </table>
@@ -901,12 +908,33 @@ cycle.head()
 
 
 ```python
-sns.violinplot(x='version', y='lead_time', data=cycle)
+from matplotlib import ticker as mticker
+import numpy as np
+
+# Adapted from <https://stackoverflow.com/a/60132262>
+fig, ax = plt.subplots(1, 3, sharey=True, figsize=(20,10))
+sns.violinplot(data=cycle,x='version', y='lead_time', ax=ax[0])
+sns.swarmplot(data=cycle,x='version', y='lead_time', ax=ax[1])
+sns.stripplot(data=cycle,x='version', y='lead_time', ax=ax[2])
+ax[0].yaxis.set_major_formatter(mticker.StrMethodFormatter("$10^{{{x:.0f}}}$"))
+ax[0].yaxis.set_ticks([np.log10(x) for p in range(-6,1) for x in np.linspace(10**p, 10**(p+1), 10)], minor=True)
 plt.show()
 ```
 
+    /usr/lib/python3/dist-packages/seaborn/categorical.py:1296: UserWarning: 79.2% of the points cannot be placed; you may want to decrease the size of the markers or use stripplot.
+      warnings.warn(msg, UserWarning)
+    /usr/lib/python3/dist-packages/seaborn/categorical.py:1296: UserWarning: 79.0% of the points cannot be placed; you may want to decrease the size of the markers or use stripplot.
+      warnings.warn(msg, UserWarning)
+    /usr/lib/python3/dist-packages/seaborn/categorical.py:1296: UserWarning: 90.1% of the points cannot be placed; you may want to decrease the size of the markers or use stripplot.
+      warnings.warn(msg, UserWarning)
+    /usr/lib/python3/dist-packages/seaborn/categorical.py:1296: UserWarning: 79.4% of the points cannot be placed; you may want to decrease the size of the markers or use stripplot.
+      warnings.warn(msg, UserWarning)
+    /usr/lib/python3/dist-packages/seaborn/categorical.py:1296: UserWarning: 79.5% of the points cannot be placed; you may want to decrease the size of the markers or use stripplot.
+      warnings.warn(msg, UserWarning)
 
-![png](README_files/README_17_0.png)
+
+
+![png](README_files/README_17_1.png)
 
 
 
