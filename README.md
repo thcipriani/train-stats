@@ -529,9 +529,9 @@ block_df.group_blocked.value_counts()
 
 
 
-    -1    242
-     1    232
-     0    180
+    -1    244
+     1    235
+     0    181
      2     93
     Name: group_blocked, dtype: int64
 
@@ -551,12 +551,12 @@ block_df.version
     3      1.37.0-wmf.12
     4      1.37.0-wmf.12
                ...      
-    742    1.37.0-wmf.17
-    743    1.37.0-wmf.17
-    744    1.37.0-wmf.17
-    745    1.37.0-wmf.17
-    746    1.37.0-wmf.17
-    Name: version, Length: 747, dtype: object
+    748    1.37.0-wmf.18
+    749    1.37.0-wmf.18
+    750    1.37.0-wmf.18
+    751    1.37.0-wmf.18
+    752    1.37.0-wmf.18
+    Name: version, Length: 753, dtype: object
 
 
 
@@ -634,51 +634,51 @@ patches.describe()
   <tbody>
     <tr>
       <th>count</th>
-      <td>6.137000e+04</td>
-      <td>6.137000e+04</td>
-      <td>61370.000000</td>
+      <td>6.161400e+04</td>
+      <td>6.161400e+04</td>
+      <td>6.161400e+04</td>
     </tr>
     <tr>
       <th>mean</th>
-      <td>1.568131e+09</td>
-      <td>4.158584e+02</td>
-      <td>-90.335180</td>
+      <td>1.568369e+09</td>
+      <td>4.153018e+02</td>
+      <td>-3.599921e+02</td>
     </tr>
     <tr>
       <th>std</th>
-      <td>3.338680e+07</td>
-      <td>6.985373e+04</td>
-      <td>2949.141918</td>
+      <td>3.353360e+07</td>
+      <td>6.971539e+04</td>
+      <td>6.699696e+04</td>
     </tr>
     <tr>
       <th>min</th>
       <td>1.431572e+09</td>
       <td>0.000000e+00</td>
-      <td>-545717.000000</td>
+      <td>-1.661412e+07</td>
     </tr>
     <tr>
       <th>25%</th>
-      <td>1.539127e+09</td>
+      <td>1.539219e+09</td>
       <td>2.000000e+00</td>
-      <td>-17.000000</td>
+      <td>-1.700000e+01</td>
     </tr>
     <tr>
       <th>50%</th>
-      <td>1.570179e+09</td>
+      <td>1.570374e+09</td>
       <td>6.000000e+00</td>
-      <td>-4.000000</td>
+      <td>-4.000000e+00</td>
     </tr>
     <tr>
       <th>75%</th>
-      <td>1.593774e+09</td>
+      <td>1.594246e+09</td>
       <td>3.100000e+01</td>
-      <td>-1.000000</td>
+      <td>-1.000000e+00</td>
     </tr>
     <tr>
       <th>max</th>
-      <td>1.627979e+09</td>
+      <td>1.628584e+09</td>
       <td>1.728860e+07</td>
-      <td>0.000000</td>
+      <td>0.000000e+00</td>
     </tr>
   </tbody>
 </table>
@@ -786,20 +786,127 @@ out = out[out['link'] != 'https://gerrit.wikimedia.org/r/#/q/9a08dbab,n,z'] # Th
 out['ok'] = out['loc'].cumsum()
 ```
 
+## Cycle time/Lead time
+
+**Cycle time** is the time from when a patch enters code review to the time that it's in production. **Lead time** is the time it takes from commit to production.
+
 
 ```python
-out['ok'].plot.line()
+# GOAL
+#         train     lead_time    cycle_time   Id
+# 0    1.37.0-wmf.6    200   2000   u1234
+# 1    1.37.0-wmf.6    123   2800   u1235
+
+cycle = pd.read_sql('''
+SELECT
+    version,
+    datetime(start_time, 'unixepoch'),
+    (start_time - created) as lead_time,
+    (start_time - submitted) as cycle_time,
+    datetime(created, 'unixepoch'),
+    datetime(submitted, 'unixepoch'),
+    link
+FROM patch p JOIN train t ON t.id = p.train_id
+WHERE lead_time > 0 AND cycle_time > 0 AND version = '1.37.0-wmf.16' OR version = '1.37.0-wmf.17' OR version = '1.37.0-wmf.15' OR version = '1.37.0-wmf.14'
+''', engine)
+cycle.head()
 ```
 
 
 
 
-    <AxesSubplot:xlabel='submitted'>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>version</th>
+      <th>datetime(start_time, 'unixepoch')</th>
+      <th>lead_time</th>
+      <th>cycle_time</th>
+      <th>datetime(created, 'unixepoch')</th>
+      <th>datetime(submitted, 'unixepoch')</th>
+      <th>link</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1.37.0-wmf.16</td>
+      <td>2021-07-27 19:25:08</td>
+      <td>40679</td>
+      <td>39642</td>
+      <td>2021-07-27 08:07:09</td>
+      <td>2021-07-27 08:24:26</td>
+      <td>https://gerrit.wikimedia.org/r/q/708196</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1.37.0-wmf.16</td>
+      <td>2021-07-27 19:25:08</td>
+      <td>71489</td>
+      <td>49427</td>
+      <td>2021-07-26 23:33:39</td>
+      <td>2021-07-27 05:41:21</td>
+      <td>https://gerrit.wikimedia.org/r/q/708147</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1.37.0-wmf.16</td>
+      <td>2021-07-27 19:25:08</td>
+      <td>372587</td>
+      <td>48983</td>
+      <td>2021-07-23 11:55:21</td>
+      <td>2021-07-27 05:48:45</td>
+      <td>https://gerrit.wikimedia.org/r/q/707010</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1.37.0-wmf.16</td>
+      <td>2021-07-27 19:25:08</td>
+      <td>2756897</td>
+      <td>82830</td>
+      <td>2021-06-25 21:36:51</td>
+      <td>2021-07-26 20:24:38</td>
+      <td>https://gerrit.wikimedia.org/r/q/701578</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1.37.0-wmf.16</td>
+      <td>2021-07-27 19:25:08</td>
+      <td>935165</td>
+      <td>84491</td>
+      <td>2021-07-16 23:39:03</td>
+      <td>2021-07-26 19:56:57</td>
+      <td>https://gerrit.wikimedia.org/r/q/705004</td>
+    </tr>
+  </tbody>
+</table>
+</div>
 
 
 
 
-![png](README_files/README_15_1.png)
+```python
+sns.violinplot(x='version', y='lead_time', data=cycle)
+plt.show()
+```
+
+
+![png](README_files/README_17_0.png)
 
 
 
