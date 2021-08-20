@@ -203,10 +203,18 @@ class TrainBlockers(object):
         constraints = {
             'query': 'title:"{} deployment blockers"'.format(self.version)
         }
-        task_id = self.phab.maniphest.search(
-            constraints=constraints,
-            queryKey='k5YunDeBIWUo'
-        )['data'][0]['id']
+        try:
+            task_id = self.phab.maniphest.search(
+                constraints=constraints,
+                queryKey='k5YunDeBIWUo'
+            )['data'][0]['id']
+        except IndexError:
+            # This might be pre 1.31.0 which means it's not a
+            # "release" task type, try a different queryKey
+            task_id = self.phab.maniphest.search(
+                constraints=constraints,
+                queryKey='guO.3LPHn1Ao'
+            )['data'][0]['id']
         return task_id
 
     @property

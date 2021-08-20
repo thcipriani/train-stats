@@ -85,8 +85,9 @@ def get_patch_info(changelog_item):
     try:
         cr = patch_json['current_revision']
     except UnboundLocalError:
-        print(f'Couldn\'t find the Gerrit change for: {changelog_item}')
-        print(subjects)
+        txt = re.sub('\W', '.', changelog_item.text)
+        print(f'Couldn\'t find the Gerrit change for: {txt} ({change_id})')
+        print([re.sub('\W', '.', sub) for sub in subjects])
         raise
     r = requests.get(os.path.join(GERRIT, 'changes', str(patch_json['_number']), 'revisions', cr, 'related'))
     r.raise_for_status()
