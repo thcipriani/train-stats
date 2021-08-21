@@ -85,9 +85,33 @@ def get_patch_info(changelog_item):
     try:
         cr = patch_json['current_revision']
     except UnboundLocalError:
-        print(f'Couldn\'t find the Gerrit change for: {changelog_item}')
-        print(subjects)
-        raise
+        txt = re.sub('\W', '.', changelog_item.text)
+        print(f'Couldn\'t find the Gerrit change for: {txt} ({change_id})')
+        print([re.sub('\W', '.', sub) for sub in subjects])
+        # raise
+        # Sometimes the changelog notes don't match the patches...
+        #
+        # For versions:
+        #
+        # * 1.27.0-wmf.22
+        # * 1.28.0-wmf.1
+        # * 1.28.0-wmf.13
+        # * 1.28.0-wmf.18
+        # * 1.28.0-wmf.2
+        # * 1.28.0-wmf.21
+        # * 1.28.0-wmf.4
+        # * 1.29.0-wmf.1
+        # * 1.29.0-wmf.15
+        # * 1.29.0-wmf.4
+        # * 1.29.0-wmf.6
+        # * 1.29.0-wmf.7
+        # * 1.30.0-wmf.4
+        # * 1.30.0-wmf.6
+        # * 1.30.0-wmf.9
+        #
+        # One of the problems was "transaction" vs "transacton".
+        # Helpful editors fixing wiki typos ¯\_(ツ)_/¯
+        return None
     r = requests.get(os.path.join(GERRIT, 'changes', str(patch_json['_number']), 'revisions', cr, 'related'))
     r.raise_for_status()
     related = json.loads(r.text[5:])
