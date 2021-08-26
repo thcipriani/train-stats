@@ -112,9 +112,9 @@ df.head()
       <td>5</td>
       <td>3</td>
       <td>450</td>
-      <td>36809044</td>
-      <td>27</td>
-      <td>36952873</td>
+      <td>36809044.0</td>
+      <td>27.0</td>
+      <td>36952873.0</td>
     </tr>
     <tr>
       <th>1</th>
@@ -127,9 +127,9 @@ df.head()
       <td>7</td>
       <td>6</td>
       <td>366</td>
-      <td>56122286</td>
-      <td>30</td>
-      <td>56562620</td>
+      <td>56122286.0</td>
+      <td>30.0</td>
+      <td>56562620.0</td>
     </tr>
     <tr>
       <th>2</th>
@@ -142,9 +142,9 @@ df.head()
       <td>9</td>
       <td>4</td>
       <td>422</td>
-      <td>38820872</td>
-      <td>29</td>
-      <td>38982601</td>
+      <td>38820872.0</td>
+      <td>29.0</td>
+      <td>38982601.0</td>
     </tr>
     <tr>
       <th>3</th>
@@ -157,9 +157,9 @@ df.head()
       <td>1</td>
       <td>1</td>
       <td>566</td>
-      <td>47181045</td>
-      <td>31</td>
-      <td>47755190</td>
+      <td>47181045.0</td>
+      <td>31.0</td>
+      <td>47755190.0</td>
     </tr>
     <tr>
       <th>4</th>
@@ -172,9 +172,9 @@ df.head()
       <td>7</td>
       <td>1</td>
       <td>273</td>
-      <td>110996452</td>
-      <td>33</td>
-      <td>111569626</td>
+      <td>110996452.0</td>
+      <td>33.0</td>
+      <td>111569626.0</td>
     </tr>
   </tbody>
 </table>
@@ -265,9 +265,9 @@ df[df['blockers'] > 10].sort_values(by='blockers', ascending=False)
       <td>20</td>
       <td>11</td>
       <td>413</td>
-      <td>60583935</td>
-      <td>37</td>
-      <td>60715205</td>
+      <td>60583935.0</td>
+      <td>37.0</td>
+      <td>60715205.0</td>
     </tr>
     <tr>
       <th>103</th>
@@ -280,9 +280,9 @@ df[df['blockers'] > 10].sort_values(by='blockers', ascending=False)
       <td>17</td>
       <td>11</td>
       <td>391</td>
-      <td>107411197</td>
-      <td>45</td>
-      <td>107659715</td>
+      <td>107411197.0</td>
+      <td>45.0</td>
+      <td>107659715.0</td>
     </tr>
     <tr>
       <th>77</th>
@@ -295,9 +295,9 @@ df[df['blockers'] > 10].sort_values(by='blockers', ascending=False)
       <td>16</td>
       <td>7</td>
       <td>646</td>
-      <td>73502579</td>
-      <td>34</td>
-      <td>73539481</td>
+      <td>73502579.0</td>
+      <td>34.0</td>
+      <td>73539481.0</td>
     </tr>
     <tr>
       <th>136</th>
@@ -310,9 +310,24 @@ df[df['blockers'] > 10].sort_values(by='blockers', ascending=False)
       <td>14</td>
       <td>12</td>
       <td>822</td>
-      <td>66099647</td>
-      <td>75</td>
-      <td>67210868</td>
+      <td>66099647.0</td>
+      <td>75.0</td>
+      <td>67210868.0</td>
+    </tr>
+    <tr>
+      <th>210</th>
+      <td>1.30.0-wmf.2</td>
+      <td>2</td>
+      <td>595079</td>
+      <td>0</td>
+      <td>0</td>
+      <td>782668</td>
+      <td>14</td>
+      <td>12</td>
+      <td>462</td>
+      <td>67958577.0</td>
+      <td>56.0</td>
+      <td>68943029.0</td>
     </tr>
     <tr>
       <th>124</th>
@@ -325,9 +340,9 @@ df[df['blockers'] > 10].sort_values(by='blockers', ascending=False)
       <td>12</td>
       <td>7</td>
       <td>824</td>
-      <td>64869761</td>
-      <td>44</td>
-      <td>65392036</td>
+      <td>64869761.0</td>
+      <td>44.0</td>
+      <td>65392036.0</td>
     </tr>
     <tr>
       <th>57</th>
@@ -340,9 +355,9 @@ df[df['blockers'] > 10].sort_values(by='blockers', ascending=False)
       <td>11</td>
       <td>7</td>
       <td>427</td>
-      <td>72215548</td>
-      <td>70</td>
-      <td>72206585</td>
+      <td>72215548.0</td>
+      <td>70.0</td>
+      <td>72206585.0</td>
     </tr>
     <tr>
       <th>76</th>
@@ -355,9 +370,24 @@ df[df['blockers'] > 10].sort_values(by='blockers', ascending=False)
       <td>11</td>
       <td>8</td>
       <td>471</td>
-      <td>53208155</td>
-      <td>23</td>
-      <td>53820019</td>
+      <td>53208155.0</td>
+      <td>23.0</td>
+      <td>53820019.0</td>
+    </tr>
+    <tr>
+      <th>187</th>
+      <td>1.28.0-wmf.21</td>
+      <td>1</td>
+      <td>88476</td>
+      <td>0</td>
+      <td>1</td>
+      <td>176082</td>
+      <td>11</td>
+      <td>8</td>
+      <td>514</td>
+      <td>60386455.0</td>
+      <td>93.0</td>
+      <td>61360331.0</td>
     </tr>
   </tbody>
 </table>
@@ -529,10 +559,10 @@ block_df.group_blocked.value_counts()
 
 
 
-    -1    244
-     1    235
-     0    181
-     2     93
+    -1    324
+     1    311
+     0    242
+     2    112
     Name: group_blocked, dtype: int64
 
 
@@ -551,12 +581,12 @@ block_df.version
     3      1.37.0-wmf.12
     4      1.37.0-wmf.12
                ...      
-    748    1.37.0-wmf.18
-    749    1.37.0-wmf.18
-    750    1.37.0-wmf.18
-    751    1.37.0-wmf.18
-    752    1.37.0-wmf.18
-    Name: version, Length: 753, dtype: object
+    984    1.37.0-wmf.20
+    985    1.37.0-wmf.20
+    986    1.37.0-wmf.20
+    987    1.37.0-wmf.20
+    988    1.37.0-wmf.20
+    Name: version, Length: 989, dtype: object
 
 
 
@@ -634,21 +664,21 @@ patches.describe()
   <tbody>
     <tr>
       <th>count</th>
-      <td>6.161400e+04</td>
-      <td>6.161400e+04</td>
-      <td>6.161400e+04</td>
+      <td>7.912400e+04</td>
+      <td>7.912400e+04</td>
+      <td>7.912400e+04</td>
     </tr>
     <tr>
       <th>mean</th>
-      <td>1.568369e+09</td>
-      <td>4.153018e+02</td>
-      <td>-3.599921e+02</td>
+      <td>1.550229e+09</td>
+      <td>3.714013e+02</td>
+      <td>-2.984513e+02</td>
     </tr>
     <tr>
       <th>std</th>
-      <td>3.353360e+07</td>
-      <td>6.971539e+04</td>
-      <td>6.699696e+04</td>
+      <td>4.746866e+07</td>
+      <td>6.168828e+04</td>
+      <td>5.914261e+04</td>
     </tr>
     <tr>
       <th>min</th>
@@ -658,25 +688,25 @@ patches.describe()
     </tr>
     <tr>
       <th>25%</th>
-      <td>1.539219e+09</td>
+      <td>1.515252e+09</td>
       <td>2.000000e+00</td>
-      <td>-1.700000e+01</td>
+      <td>-1.600000e+01</td>
     </tr>
     <tr>
       <th>50%</th>
-      <td>1.570374e+09</td>
+      <td>1.554719e+09</td>
       <td>6.000000e+00</td>
       <td>-4.000000e+00</td>
     </tr>
     <tr>
       <th>75%</th>
-      <td>1.594246e+09</td>
-      <td>3.100000e+01</td>
+      <td>1.589249e+09</td>
+      <td>3.000000e+01</td>
       <td>-1.000000e+00</td>
     </tr>
     <tr>
       <th>max</th>
-      <td>1.628584e+09</td>
+      <td>1.629839e+09</td>
       <td>1.728860e+07</td>
       <td>0.000000e+00</td>
     </tr>
@@ -809,10 +839,9 @@ SELECT
 FROM patch p JOIN train t ON t.id = p.train_id
 WHERE (lead_time > 0 AND cycle_time > 0)
     AND (
-        version = '1.37.0-wmf.14' OR
-        version = '1.37.0-wmf.15' OR
-        version = '1.37.0-wmf.16' OR
-        version = '1.37.0-wmf.18'
+        version = '1.37.0-wmf.18' OR
+        version = '1.37.0-wmf.19' OR
+        version = '1.37.0-wmf.20'
     )
 ''', engine)
 cycle.head()
@@ -851,53 +880,53 @@ cycle.head()
   <tbody>
     <tr>
       <th>0</th>
-      <td>wmf.14</td>
-      <td>2021-07-13 22:15:46</td>
-      <td>50935</td>
-      <td>49822</td>
-      <td>2021-07-13 08:06:51</td>
-      <td>2021-07-13 08:25:24</td>
-      <td>https://gerrit.wikimedia.org/r/q/704204</td>
+      <td>wmf.18</td>
+      <td>2021-08-10 16:46:18</td>
+      <td>31172</td>
+      <td>29749</td>
+      <td>2021-08-10 08:06:46</td>
+      <td>2021-08-10 08:30:29</td>
+      <td>https://gerrit.wikimedia.org/r/q/711026</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>wmf.14</td>
-      <td>2021-07-13 22:15:46</td>
-      <td>3619864</td>
-      <td>66729</td>
-      <td>2021-06-02 00:44:42</td>
-      <td>2021-07-13 03:43:37</td>
-      <td>https://gerrit.wikimedia.org/r/q/697641</td>
+      <td>wmf.18</td>
+      <td>2021-08-10 16:46:18</td>
+      <td>96309</td>
+      <td>60995</td>
+      <td>2021-08-09 14:01:09</td>
+      <td>2021-08-09 23:49:43</td>
+      <td>https://gerrit.wikimedia.org/r/q/710924</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>wmf.14</td>
-      <td>2021-07-13 22:15:46</td>
-      <td>113413</td>
-      <td>64290</td>
-      <td>2021-07-12 14:45:33</td>
-      <td>2021-07-13 04:24:16</td>
-      <td>https://gerrit.wikimedia.org/r/q/704070</td>
+      <td>wmf.18</td>
+      <td>2021-08-10 16:46:18</td>
+      <td>11412024</td>
+      <td>119866</td>
+      <td>2021-03-31 14:45:54</td>
+      <td>2021-08-09 07:28:32</td>
+      <td>https://gerrit.wikimedia.org/r/q/675998</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>wmf.14</td>
-      <td>2021-07-13 22:15:46</td>
-      <td>147105</td>
-      <td>57177</td>
-      <td>2021-07-12 05:24:01</td>
-      <td>2021-07-13 06:22:49</td>
-      <td>https://gerrit.wikimedia.org/r/q/703949</td>
+      <td>wmf.18</td>
+      <td>2021-08-10 16:46:18</td>
+      <td>136457</td>
+      <td>70112</td>
+      <td>2021-08-09 02:52:01</td>
+      <td>2021-08-09 21:17:46</td>
+      <td>https://gerrit.wikimedia.org/r/q/710691</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>wmf.14</td>
-      <td>2021-07-13 22:15:46</td>
-      <td>255812</td>
-      <td>115733</td>
-      <td>2021-07-10 23:12:14</td>
-      <td>2021-07-12 14:06:53</td>
-      <td>https://gerrit.wikimedia.org/r/q/703907</td>
+      <td>wmf.18</td>
+      <td>2021-08-10 16:46:18</td>
+      <td>143868</td>
+      <td>74413</td>
+      <td>2021-08-09 00:48:30</td>
+      <td>2021-08-09 20:06:05</td>
+      <td>https://gerrit.wikimedia.org/r/q/710688</td>
     </tr>
   </tbody>
 </table>
@@ -942,54 +971,54 @@ cycle.sort_values(by='lead_time', ascending=False).head()
   </thead>
   <tbody>
     <tr>
-      <th>200</th>
-      <td>wmf.15</td>
-      <td>2021-07-21 09:05:07</td>
-      <td>695245</td>
-      <td>691061</td>
-      <td>2021-07-13 07:57:42</td>
-      <td>2021-07-13 09:07:26</td>
-      <td>https://gerrit.wikimedia.org/r/q/704201</td>
+      <th>739</th>
+      <td>wmf.20</td>
+      <td>2021-08-24 19:40:27</td>
+      <td>2831251</td>
+      <td>646397</td>
+      <td>2021-07-23 01:12:56</td>
+      <td>2021-08-17 08:07:10</td>
+      <td>https://gerrit.wikimedia.org/r/q/706688</td>
     </tr>
     <tr>
-      <th>222</th>
-      <td>wmf.15</td>
-      <td>2021-07-21 09:05:07</td>
-      <td>3029693</td>
-      <td>685515</td>
-      <td>2021-06-16 07:30:14</td>
-      <td>2021-07-13 10:39:52</td>
-      <td>https://gerrit.wikimedia.org/r/q/699983</td>
+      <th>792</th>
+      <td>wmf.20</td>
+      <td>2021-08-24 19:40:27</td>
+      <td>655562</td>
+      <td>644281</td>
+      <td>2021-08-17 05:34:25</td>
+      <td>2021-08-17 08:42:26</td>
+      <td>https://gerrit.wikimedia.org/r/q/713344</td>
     </tr>
     <tr>
-      <th>312</th>
-      <td>wmf.15</td>
-      <td>2021-07-21 09:05:07</td>
-      <td>737791</td>
-      <td>680536</td>
-      <td>2021-07-12 20:08:36</td>
-      <td>2021-07-13 12:02:51</td>
-      <td>https://gerrit.wikimedia.org/r/q/704120</td>
+      <th>791</th>
+      <td>wmf.20</td>
+      <td>2021-08-24 19:40:27</td>
+      <td>805768</td>
+      <td>642568</td>
+      <td>2021-08-15 11:50:59</td>
+      <td>2021-08-17 09:10:59</td>
+      <td>https://gerrit.wikimedia.org/r/q/713068</td>
     </tr>
     <tr>
-      <th>199</th>
-      <td>wmf.15</td>
-      <td>2021-07-21 09:05:07</td>
-      <td>751533</td>
-      <td>677129</td>
-      <td>2021-07-12 16:19:34</td>
-      <td>2021-07-13 12:59:38</td>
-      <td>https://gerrit.wikimedia.org/r/q/704086</td>
+      <th>794</th>
+      <td>wmf.20</td>
+      <td>2021-08-24 19:40:27</td>
+      <td>921557</td>
+      <td>642164</td>
+      <td>2021-08-14 03:41:10</td>
+      <td>2021-08-17 09:17:43</td>
+      <td>https://gerrit.wikimedia.org/r/q/713014</td>
     </tr>
     <tr>
-      <th>248</th>
-      <td>wmf.15</td>
-      <td>2021-07-21 09:05:07</td>
-      <td>679780</td>
-      <td>674555</td>
-      <td>2021-07-13 12:15:27</td>
-      <td>2021-07-13 13:42:32</td>
-      <td>https://gerrit.wikimedia.org/r/q/704272</td>
+      <th>793</th>
+      <td>wmf.20</td>
+      <td>2021-08-24 19:40:27</td>
+      <td>805417</td>
+      <td>639977</td>
+      <td>2021-08-15 11:56:50</td>
+      <td>2021-08-17 09:54:10</td>
+      <td>https://gerrit.wikimedia.org/r/q/713069</td>
     </tr>
   </tbody>
 </table>
@@ -1003,25 +1032,126 @@ The time from commit to deploy (in seconds)
 
 
 ```python
+cycle['lead_time_days'] = cycle['lead_time'] / (60*60*24)
+cycle['cycle_time_days'] = cycle['cycle_time'] / (60*60*24)
+cycle.sort_values(by='lead_time_days').head()
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>version</th>
+      <th>datetime(start_time, 'unixepoch')</th>
+      <th>cycle_time</th>
+      <th>lead_time</th>
+      <th>datetime(created, 'unixepoch')</th>
+      <th>datetime(submitted, 'unixepoch')</th>
+      <th>link</th>
+      <th>lead_time_days</th>
+      <th>cycle_time_days</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>244</th>
+      <td>wmf.19</td>
+      <td>2021-08-17 16:16:38</td>
+      <td>29392</td>
+      <td>28054</td>
+      <td>2021-08-17 08:06:46</td>
+      <td>2021-08-17 08:29:04</td>
+      <td>https://gerrit.wikimedia.org/r/q/713380</td>
+      <td>0.324699</td>
+      <td>0.340185</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>wmf.18</td>
+      <td>2021-08-10 16:46:18</td>
+      <td>31172</td>
+      <td>29749</td>
+      <td>2021-08-10 08:06:46</td>
+      <td>2021-08-10 08:30:29</td>
+      <td>https://gerrit.wikimedia.org/r/q/711026</td>
+      <td>0.344317</td>
+      <td>0.360787</td>
+    </tr>
+    <tr>
+      <th>173</th>
+      <td>wmf.18</td>
+      <td>2021-08-10 16:46:18</td>
+      <td>5597162</td>
+      <td>34150</td>
+      <td>2021-06-06 22:00:16</td>
+      <td>2021-08-10 07:17:08</td>
+      <td>https://gerrit.wikimedia.org/r/q/698330</td>
+      <td>0.395255</td>
+      <td>64.781968</td>
+    </tr>
+    <tr>
+      <th>157</th>
+      <td>wmf.18</td>
+      <td>2021-08-10 16:46:18</td>
+      <td>38208</td>
+      <td>35953</td>
+      <td>2021-08-10 06:09:30</td>
+      <td>2021-08-10 06:47:05</td>
+      <td>https://gerrit.wikimedia.org/r/q/711023</td>
+      <td>0.416123</td>
+      <td>0.442222</td>
+    </tr>
+    <tr>
+      <th>109</th>
+      <td>wmf.18</td>
+      <td>2021-08-10 16:46:18</td>
+      <td>45674</td>
+      <td>37009</td>
+      <td>2021-08-10 04:05:04</td>
+      <td>2021-08-10 06:29:29</td>
+      <td>https://gerrit.wikimedia.org/r/q/711016</td>
+      <td>0.428345</td>
+      <td>0.528634</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
 from matplotlib import ticker as mticker
 import numpy as np
 
 # Adapted from <https://stackoverflow.com/a/60132262>
 fig, ax = plt.subplots(1, 3, sharey=True, figsize=(20,10))
-sns.violinplot(data=cycle,x='version', y='lead_time', ax=ax[0])
-sns.swarmplot(data=cycle,x='version', y='lead_time', ax=ax[1])
-sns.stripplot(data=cycle,x='version', y='lead_time', ax=ax[2])
+sns.violinplot(data=cycle,x='version', y='lead_time_days', ax=ax[0])
+sns.swarmplot(data=cycle,x='version', y='lead_time_days', ax=ax[1])
+sns.stripplot(data=cycle,x='version', y='lead_time_days', ax=ax[2])
 ax[0].yaxis.set_major_formatter(mticker.StrMethodFormatter("{x}"))
-ax[0].yaxis.set_ticks([np.log10(x) for p in range(-6,1) for x in np.linspace(10**p, 10**(p+1), 10)], minor=True)
 plt.show()
 ```
 
-    /usr/lib/python3/dist-packages/seaborn/categorical.py:1296: UserWarning: 12.1% of the points cannot be placed; you may want to decrease the size of the markers or use stripplot.
-      warnings.warn(msg, UserWarning)
 
-
-
-![png](README_files/README_19_1.png)
+![png](README_files/README_20_0.png)
 
 
 ### Cycle time
@@ -1035,26 +1165,23 @@ import numpy as np
 
 # Adapted from <https://stackoverflow.com/a/60132262>
 fig, ax = plt.subplots(1, 3, sharey=True, figsize=(20,10))
-sns.violinplot(data=cycle,x='version', y='cycle_time', ax=ax[0])
-sns.swarmplot(data=cycle,x='version', y='cycle_time', ax=ax[1])
-sns.stripplot(data=cycle,x='version', y='cycle_time', ax=ax[2])
+sns.violinplot(data=cycle,x='version', y='cycle_time_days', ax=ax[0])
+sns.swarmplot(data=cycle,x='version', y='cycle_time_days', ax=ax[1])
+sns.stripplot(data=cycle,x='version', y='cycle_time_days', ax=ax[2])
 ax[0].yaxis.set_major_formatter(mticker.StrMethodFormatter("{x}"))
-ax[0].yaxis.set_ticks([np.log10(x) for p in range(-6,1) for x in np.linspace(10**p, 10**(p+1), 10)], minor=True)
 plt.show()
 ```
 
-    /usr/lib/python3/dist-packages/seaborn/categorical.py:1296: UserWarning: 71.8% of the points cannot be placed; you may want to decrease the size of the markers or use stripplot.
+    /usr/lib/python3/dist-packages/seaborn/categorical.py:1296: UserWarning: 71.3% of the points cannot be placed; you may want to decrease the size of the markers or use stripplot.
       warnings.warn(msg, UserWarning)
-    /usr/lib/python3/dist-packages/seaborn/categorical.py:1296: UserWarning: 70.7% of the points cannot be placed; you may want to decrease the size of the markers or use stripplot.
+    /usr/lib/python3/dist-packages/seaborn/categorical.py:1296: UserWarning: 86.5% of the points cannot be placed; you may want to decrease the size of the markers or use stripplot.
       warnings.warn(msg, UserWarning)
-    /usr/lib/python3/dist-packages/seaborn/categorical.py:1296: UserWarning: 85.2% of the points cannot be placed; you may want to decrease the size of the markers or use stripplot.
-      warnings.warn(msg, UserWarning)
-    /usr/lib/python3/dist-packages/seaborn/categorical.py:1296: UserWarning: 73.0% of the points cannot be placed; you may want to decrease the size of the markers or use stripplot.
+    /usr/lib/python3/dist-packages/seaborn/categorical.py:1296: UserWarning: 71.7% of the points cannot be placed; you may want to decrease the size of the markers or use stripplot.
       warnings.warn(msg, UserWarning)
 
 
 
-![png](README_files/README_21_1.png)
+![png](README_files/README_22_1.png)
 
 
 
