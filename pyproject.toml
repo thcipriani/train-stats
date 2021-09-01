@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "train-stats"
+version = "0.1.0"
+description = "exploratory data analysis of wikimedia production deployments."
+authors = ["Tyler Cipriani <thcipriani@wikimedia.org>",
+            "Mukunda Modell <mmodell@wikimedia.org>"]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+datasette = "^0.58.1"
+datasette-dashboards = "^0.1.6"
+datasette-vega = "^0.6.2"
+
+
+[tool.poetry.dev-dependencies]
+ipython = "^7.27.0"
+ddd = "^0.6"
+phabricator = "^0.8.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
