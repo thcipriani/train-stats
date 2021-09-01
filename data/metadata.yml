@@ -1,0 +1,136 @@
+databases:
+  train:
+    queries:
+      train-overview:
+        SELECT
+            version,
+            rollbacks,
+            rollbacks_time,
+            group2_delay_days,
+            (group0_delay_days +
+            group1_delay_days +
+            group2_delay_days) as total_delay,
+            total_time as train_total_time,
+            (select count(*) from blocker b where b.train_id = t.id) as blockers,
+            (select count(*) from blocker b where b.train_id = t.id and resolved = 1) as resolved_blockers,
+            patches,
+            (select max(time_in_review) from patch p where p.train_id = t.id)/(60*60)  as max_time_in_review,
+            (select max(comments) from patch where patch.train_id = t.id) as max_comments_per_patch,
+            (select max(start_time - created) from patch p where p.train_id = t.id)/(60*60) as max_cycle_time
+        FROM train t
+        ORDER BY version DESC limit 10
+
+plugins:
+  datasette-dashboards:
+    train:
+      title: Train Dashboard
+      description: Train metrics demo
+      layout:
+        - [train-timing, events-count]
+        - [train-timing, train-patches]
+      filters:
+        date_start:
+          name: Date Start
+          type: date
+          default: "2021-01-01"
+        date_end:
+          name: Date End
+          type: date
+      charts:
+        analysis-note:
+          library: markdown
+          display: |-
+            # Analysis notes
+            > A quick rundown of events statistics and KPIs
+
+        events-count:
+          title: Total number of trains
+          db: train
+          query: SELECT count(*) as count FROM train
+          library: metric
+          display:
+            field: count
+            prefix:
+            suffix:
+
+        train-patches:
+          title: Number of trains by conductor
+          db: train
+          query: SELECT conductor, count(version) as count, sum(patches) as patches, sum(rollbacks) as rollbacks FROM train WHERE TRUE GROUP BY conductor
+          library: vega
+          display:
+            mark: { type: bar, tooltip: true }
+            encoding:
+              y: { field: conductor, type: nominal }
+              color: { field: conductor, type: nominal }
+              x: { field: count, type: quantitative }
+
+        train-timing:
+          title: Cycle time and Lead time
+          db: train
+          query: SELECT
+                    t.id,
+                    t.version,
+                    datetime(start_time, 'unixepoch') as start_time,
+                    (start_time - created)/(60*60) as cycle_time,
+                    (start_time - submitted)/(60*60) as lead_time,
+                    datetime(created, 'unixepoch') as created,
+                    datetime(submitted, 'unixepoch') submitted
+                  FROM
+                    patch p
+                    JOIN train t ON t.id = p.train_id
+                  WHERE
+                    (
+                      lead_time > 0
+                      AND cycle_time > 0
+                    )
+                    order by start_time desc
+          library: vega
+          display:
+            transform: [
+              {
+                fold: ["lead_time", "cycle_time"]
+              }
+            ]
+
+            layer: [
+              {
+                mark: { type: bar }
+              },
+              {
+                mark: { type: text, color: white, dx: 10 },
+                encoding: {
+                  text: {
+                     field: value,
+                     aggregate: mean,
+                     format: d,
+                     fontSize: 18
+                  },
+                  color: { value: white }
+
+                }
+              }
+            ]
+            encoding: {
+              x: {
+                aggregate: mean,
+                field: value,
+                axis: { title: "Lead, Cycle time (minutes)", labelFontSize: 12 },
+                type: quantitative,
+                # "scale": {"zero": false},
+              },
+              y: {
+                  field: version,
+                  type: ordinal,
+                  axis: {
+                    labelAngle: 0,
+                    labelFontSize: 17
+                  },
+              },
+              color: {
+                field: key,
+                type: nominal,
+              }
+            }
+
+
