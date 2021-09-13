@@ -33,4 +33,9 @@ def parse_args():
         action='store_true',
         help='update only'
     )
+    ap.add_argument(
+        '--only-bugs',
+        action='store_true',
+        help='only insert train bugs'
+    )
     return ap.parse_args()
