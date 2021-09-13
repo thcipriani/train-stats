@@ -49,4 +49,4 @@ dbs-from-scratch:
 	for i in {1..26}; do python3 stats-per-train.py -w 1.32.0-wmf.$$i; done
 	for i in {1..30}; do python3 stats-per-train.py -w 1.31.0-wmf.$$i; done
 
-.PHONY: older start blockers dbs-from-scratch
+.PHONY: bugs older start blockers dbs-from-scratch
