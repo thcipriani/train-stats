@@ -80,6 +80,8 @@ class Bugs(object):
             return self.tasks
 
     def _phab_proj_search(self, projects, after=None):
+        if not projects:
+            return self.projects
         query = {
             'constraints': {
                 'phids': projects,
@@ -97,6 +99,8 @@ class Bugs(object):
             return self.projects
 
     def _phab_user_search(self, users, after=None):
+        if not users:
+            return self.users
         query = {
             'constraints': {
                 'phids': users,
@@ -133,7 +137,7 @@ class Bugs(object):
             for proj in task['task']['attachments']['projects']['projectPHIDs']:
                 task['phab']['projects'].append(self.projects[proj])
 
-            if closer:
+            if closer and self.users:
                 task['phab']['closer'] = self.users[closer]
 
             task['phab']['url'] = f'https://phabricator.wikimedia.org/T{task["task"]["id"]}'
@@ -142,7 +146,8 @@ class Bugs(object):
             task['phab']['closed'] = task['task']['fields']['dateClosed']
             task['phab']['status'] = task['task']['fields']['status']['value']
             task['phab']['priority'] = task['task']['fields']['priority']['value']
-            task['phab']['author'] = self.users[task['task']['fields']['authorPHID']]
+            if self.users:
+                task['phab']['author'] = self.users[task['task']['fields']['authorPHID']]
 
     def search(self):
         bugs = [*self.backports.keys()]
