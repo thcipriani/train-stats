@@ -17,8 +17,15 @@ def get_bug(patch):
     msg = patch['revisions'][rev]['commit']['message'].splitlines()
     bug_footers = [line for line in msg if line.startswith('Bug: ')]
     for bug in bug_footers:
-        # "Bug: T200" -> "200"
-        bugs.append(int(bug.split(':')[-1].strip()[1:]))
+        # "Bug: T200" -> ["200"]
+        # OR "Bug: T200, T100" -> ["200", "100"]
+        bug_id = bug.split(':')[-1]
+        if ',' in bug_id:
+            bug_ids = bug_id.split(',')
+        else:
+            bug_ids = [bug_id]
+
+        bugs += [int(b.strip()[1:]) for b in bug_ids]
     return bugs
 
 
