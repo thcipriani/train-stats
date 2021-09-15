@@ -1184,6 +1184,307 @@ plt.show()
 ![png](README_files/README_22_1.png)
 
 
+## Train bugfixes
+
+> **Backport**
+> * v. To retroactively supply a fix, or a new feature, to a previous version of a software product at the same time (or after) supplying it to the current version.
+> * n. A commit that is backported
+
+Each train has many backports. Each backport may be supplied to many trains. Backports add features, change feature flags, and fix bugs.
+
+Some backports have tasks associated with them. Some tasks are "bugs" or "errors".
+
+When a backport is associated with a task that is a "bug" or an "error" it's a bugfix. The number of bugfixes per train is a good signal of the number of bugs that were present in that train.
+
+Bugs may persist for many trains; however, if a developer makes a backport, they felt that the bug was severe enough to warrant fixing immediately rather than waiting a week—that's signal about train quality, too.
+
+
+```python
+train_bugs = pd.read_sql('''
+select
+  version,
+  count(b.link) as bug_count
+from
+  train t
+  join bug_train bt on bt.train_id = t.id
+  join bug b on bt.bug_id = b.id
+group by
+  version
+order by
+  start_time
+''', engine)
+train_bugs.head()
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>version</th>
+      <th>bug_count</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1.27.0-wmf.16</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1.27.0-wmf.19</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1.27.0-wmf.21</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1.27.0-wmf.22</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1.27.0-wmf.23</td>
+      <td>3</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+### Bug count histogram
+
+Seems to follow the power law
+
+
+```python
+train_bugs.hist()
+```
+
+
+
+
+    array([[<AxesSubplot:title={'center':'bug_count'}>]], dtype=object)
+
+
+
+
+![png](README_files/README_26_1.png)
+
+
+
+```python
+train_bugs.sort_values(by="bug_count", ascending=False).head()
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>version</th>
+      <th>bug_count</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>120</th>
+      <td>1.34.0-wmf.13</td>
+      <td>13</td>
+    </tr>
+    <tr>
+      <th>194</th>
+      <td>1.37.0-wmf.5</td>
+      <td>11</td>
+    </tr>
+    <tr>
+      <th>206</th>
+      <td>1.37.0-wmf.20</td>
+      <td>11</td>
+    </tr>
+    <tr>
+      <th>119</th>
+      <td>1.34.0-wmf.11</td>
+      <td>11</td>
+    </tr>
+    <tr>
+      <th>90</th>
+      <td>1.32.0-wmf.24</td>
+      <td>11</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+train_bugs = pd.read_sql('''
+select
+  version,
+  count(b.link) as bug_count,
+  rollbacks,
+  (select count(*) from blocker b where b.train_id = t.id and resolved = 1) as resolved_blockers,
+      (select max(time_in_review) from patch p where p.train_id = t.id) as max_time_in_review,
+    (select max(comments) from patch where patch.train_id = t.id) as max_comments_per_patch,
+    (select max(start_time - created) from patch p where p.train_id = t.id) as max_cycle_time,
+  patches
+from
+  train t
+  join bug_train bt on bt.train_id = t.id
+  join bug b on bt.bug_id = b.id
+group by
+  version
+order by
+  start_time
+''', engine)
+train_bugs.head()
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>version</th>
+      <th>bug_count</th>
+      <th>rollbacks</th>
+      <th>resolved_blockers</th>
+      <th>max_time_in_review</th>
+      <th>max_comments_per_patch</th>
+      <th>max_cycle_time</th>
+      <th>patches</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1.27.0-wmf.16</td>
+      <td>3</td>
+      <td>1</td>
+      <td>0</td>
+      <td>17557313.0</td>
+      <td>95.0</td>
+      <td>18128243.0</td>
+      <td>322</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1.27.0-wmf.19</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>58248774.0</td>
+      <td>45.0</td>
+      <td>58798558.0</td>
+      <td>230</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1.27.0-wmf.21</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>120956985.0</td>
+      <td>73.0</td>
+      <td>120937246.0</td>
+      <td>180</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1.27.0-wmf.22</td>
+      <td>2</td>
+      <td>0</td>
+      <td>0</td>
+      <td>50045244.0</td>
+      <td>58.0</td>
+      <td>50160003.0</td>
+      <td>416</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1.27.0-wmf.23</td>
+      <td>3</td>
+      <td>2</td>
+      <td>3</td>
+      <td>20153065.0</td>
+      <td>40.0</td>
+      <td>20228209.0</td>
+      <td>168</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+fig, ax = plt.subplots(figsize=(10,10))         # Sample figsize in inches
+sns.heatmap(train_bugs.corr(), annot=True, cmap="YlGnBu", linewidths=0.3, annot_kws={"size": 8}, ax=ax)
+plt.xticks(rotation=90)
+plt.yticks(rotation=0)
+plt.show()
+```
+
+
+![png](README_files/README_29_0.png)
+
+
 
 ```python
 
