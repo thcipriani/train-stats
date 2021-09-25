@@ -2,6 +2,7 @@ import json
 from dateutil import parser
 from datetime import date, datetime
 import os
+import re
 import sys
 
 import requests
@@ -29,7 +30,7 @@ def get_bug(patch):
     return bugs
 
 
-def confirm_change_id(patches, change_id):
+def confirm_change_id(patches, change_id, changelog_item):
     """
     Find the right patch in the list of patches
     """
@@ -44,7 +45,7 @@ def confirm_change_id(patches, change_id):
         subjects.append(patch_subj)
         # substring matches with, like ::static_method don't match so...
         if (re.sub('\W', '.', patch_subj) in
-                re.sub('\W', '.', changelog_item.text)):
+                re.sub('\W', '.', changelog_item)):
             patch_json = patch
             break
 
@@ -52,7 +53,7 @@ def confirm_change_id(patches, change_id):
         cr = patch_json['current_revision']
         return [patch_json]
     except UnboundLocalError:
-        txt = re.sub('\W', '.', changelog_item.text)
+        txt = re.sub('\W', '.', changelog_item)
         print(f'Couldn\'t find the Gerrit change for: {txt} ({change_id})')
         print([re.sub('\W', '.', sub) for sub in subjects])
         # raise
@@ -80,7 +81,7 @@ def confirm_change_id(patches, change_id):
         # Helpful editors fixing wiki typos ¯\_(ツ)_/¯
         return []
 
-def search(change_id=None, branch=None):
+def search(change_id=None, branch=None, changelog_item=None):
     """
     * Curl gerrit for change info
     * remove first 6 bytes
@@ -92,8 +93,8 @@ def search(change_id=None, branch=None):
         * deletions
         * total_comment_count
     """
-    if change_id is not None and bug is not None:
-        raise RuntimeError('Do not pass both bug and change_id')
+    if change_id is not None and branch is not None:
+        raise RuntimeError('Do not pass both branch and change_id')
 
     if change_id is not None:
         query = change_id
@@ -122,7 +123,10 @@ def search(change_id=None, branch=None):
     if not isinstance(patch_jsons, list):
         patch_jsons = [patch_jsons]
 
-    patch_jsons = fn(patch_jsons, change_id or branch)
+    if changelog_item is not None:
+        patch_jsons = fn(patch_jsons, change_id or branch, changelog_item.text)
+    else:
+        patch_jsons = fn(patch_jsons, change_id or branch)
     patches_stats = []
 
     for patch_json in patch_jsons:

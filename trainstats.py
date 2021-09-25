@@ -53,7 +53,7 @@ def get_patch_info(changelog_item):
         return None
 
     change_id = changelog_item.link.split('/')[-1].split(',')[0]
-    changes = gerrit.search(change_id=change_id)
+    changes = gerrit.search(change_id=change_id, changelog_item=changelog_item)
 
     if changes:
         return changes
@@ -561,7 +561,7 @@ if __name__ == '__main__':
             patches_for_version[version] = patches
             for patch in patches_for_version[version]:
                 print(patch)
-                patch_data = get_patch_info(patch)
+                patch_data = get_patch_info(patch)[0]
                 if patch_data is None:
                     continue
                 try:
