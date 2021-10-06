@@ -2,7 +2,6 @@
 
 import argparse
 
-
 def parse_args():
     ap = argparse.ArgumentParser()
     ap.add_argument(
@@ -37,5 +36,10 @@ def parse_args():
         '--only-bugs',
         action='store_true',
         help='only insert train bugs'
+    )
+    ap.add_argument(
+        '--tylers-only-do-this',
+        action='store_true',
+        help='I am dummy'
     )
     return ap.parse_args()
