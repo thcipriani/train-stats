@@ -448,6 +448,45 @@ if __name__ == '__main__':
 
         patches, patch_count = get_patches_for_version(version)
 
+        # This is, hopefully, my one time stupidity
+        # It duplicates code, but it's a one-off thing...don't judge me
+        # Can kill all the code in the block, post migration.
+        if args.tylers_only_do_this:
+            wmf_version = version
+            if not wmf_version.startswith('wmf/'):
+                wmf_version = f'wmf/{wmf_version}'
+            train_bugs = bugs.get_all(wmf_version)
+
+
+            train_bugs = bugs.get_all(wmf_version)
+
+            for bug_id, bug in train_bugs.items():
+                print(f'BACKPORT: {bug["phab"]["url"]} ({bug["patch"]["link"]})')
+                crs.execute('''
+                    UPDATE bug_patch
+                    SET project = ?
+                    WHERE link = ?''', (
+                        bug['patch']['project'],
+                        bug['patch']['link']
+                    )
+                )
+
+            for patch in patches:
+                print(patch)
+                patch_data = get_patch_info(patch)[0]
+                if patch_data is None:
+                    continue
+                crs.execute('''
+                    UPDATE patch
+                    SET project = ?
+                    WHERE link = ?''', (
+                        patch_data['project'],
+                        patch_data['link']
+                    )
+                )
+            conn.commit()
+            sys.exit(0)
+
         # Don't touch data, just print and exit
         if args.show_rollbacks:
             print(f'START TIME: {start_time}')
@@ -576,8 +615,9 @@ if __name__ == '__main__':
                             patch_deps,
                             comments,
                             link,
-                            time_in_review
-                        ) VALUES(?,?,?,?,?,?,?,?,?,?)''', (
+                            time_in_review,
+                            project
+                        ) VALUES(?,?,?,?,?,?,?,?,?,?,?)''', (
                             train_id,
                             patch_data['created'],
                             patch_data['submitted'],
@@ -587,7 +627,8 @@ if __name__ == '__main__':
                             patch_data['patch_deps'],
                             patch_data['comments'],
                             patch_data['link'],
-                            patch_data['time_in_review']
+                            patch_data['time_in_review'],
+                            patch_data['project']
                         )
                     )
                 # 8: sha1 is not unique
@@ -686,8 +727,9 @@ if __name__ == '__main__':
                             patch_deps,
                             comments,
                             link,
-                            time_in_review
-                        ) VALUES(?,?,?,?,?,?,?,?,?,?)''', (
+                            time_in_review,
+                            project
+                        ) VALUES(?,?,?,?,?,?,?,?,?,?,?)''', (
                             train_id,
                             bug['patch']['created'],
                             bug['patch']['submitted'],
@@ -697,7 +739,8 @@ if __name__ == '__main__':
                             bug['patch']['patch_deps'],
                             bug['patch']['comments'],
                             bug['patch']['link'],
-                            bug['patch']['time_in_review']
+                            bug['patch']['time_in_review'],
+                            bug['patch']['project']
                         )
                     )
                 except sqlite3.IntegrityError:

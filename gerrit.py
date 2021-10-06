@@ -147,6 +147,7 @@ def search(change_id=None, branch=None, changelog_item=None):
             'created': int(parser.parse(patch_json['created'], ignoretz=True).timestamp()),
             'submitted': int(parser.parse(patch_json['submitted'], ignoretz=True).timestamp()),
             'insertions': patch_json['insertions'],
+            'project': patch_json['project'],
             'deletions': patch_json['deletions'],
             'loc': patch_json['insertions'] + patch_json['deletions'],
             'files': patch_files,
