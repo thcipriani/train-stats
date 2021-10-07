@@ -26,8 +26,25 @@ def get_bug(patch):
         else:
             bug_ids = [bug_id]
 
-        bugs += [int(b.strip()[1:]) for b in bug_ids]
+        # Remove links to specific comments on bugs
+        for b in bug_ids:
+            b = b.strip()[1:]
+            if '#' in b:
+                b = b.split('#')[0]
+            if b.startswith('t') or b.startswith('T'):
+                b = b[1:]
+            try:
+                b = int(b)
+            except ValueError:
+                continue  # Skip this one
+            bugs.append(b)
     return bugs
+
+
+def get_submitted(patch_json):
+    if not patch_json.get('submitted'):
+        return False
+    return int(parser.parse(patch_json['submitted'], ignoretz=True).timestamp())
 
 
 def confirm_change_id(patches, change_id, changelog_item):
@@ -96,13 +113,15 @@ def search(change_id=None, branch=None, changelog_item=None):
     if change_id is not None and branch is not None:
         raise RuntimeError('Do not pass both branch and change_id')
 
-    if change_id is not None:
-        query = change_id
+    fn = lambda x, y: x
+    if change_id is not None and changelog_item is not None:
         fn = confirm_change_id
 
     if branch is not None:
         query = f'branch:{branch}+is:merged'
-        fn = lambda x, y: x
+
+    if change_id is not None:
+        query = change_id
 
     url = ''.join([
         URL,
@@ -145,7 +164,7 @@ def search(change_id=None, branch=None, changelog_item=None):
         patch_files = [*patch_json['revisions'][[*patch_json['revisions'].keys()][0]]['files'].keys()]
         patch_stats = {
             'created': int(parser.parse(patch_json['created'], ignoretz=True).timestamp()),
-            'submitted': int(parser.parse(patch_json['submitted'], ignoretz=True).timestamp()),
+            'submitted': get_submitted(patch_json),
             'insertions': patch_json['insertions'],
             'project': patch_json['project'],
             'deletions': patch_json['deletions'],

@@ -44,16 +44,22 @@ class ChangelogItem(object):
         return f'CHANGELOGITEM({self.text}, {self.link})'
 
 
-def get_patch_info(changelog_item):
+def extract_changeid(change_url):
     """
     Patch info:
     * extract changeid ('https://gerrit.wikimedia.org/r/#/q/6df84533,n,z')
     """
+    return change_url.split('/')[-1].split(',')[0]
+
+
+def get_patch_info(changelog_item):
     if not changelog_item.link.startswith(gerrit.URL):
         return None
 
-    change_id = changelog_item.link.split('/')[-1].split(',')[0]
-    changes = gerrit.search(change_id=change_id, changelog_item=changelog_item)
+    changes = gerrit.search(
+        change_id=extract_changeid(changelog_item.link),
+        changelog_item=changelog_item
+    )
 
     if changes:
         return changes
@@ -471,19 +477,38 @@ if __name__ == '__main__':
                     )
                 )
 
+            # Handle this stupid fucking goddamn corner case
+            # https://gerrit.wikimedia.org/r/q/1490e9da
+            # https://gerrit.wikimedia.org/r/#/q/1490e9da,n,z
             for patch in patches:
                 print(patch)
-                patch_data = get_patch_info(patch)[0]
+                patch_data = get_patch_info(patch)
                 if patch_data is None:
                     continue
+                patch_data = patch_data[0]
+                if patch_data is None:
+                    continue
+                proj = patch_data['project']
+                patchlink = patch.link
+                stupid_asshole_patchlink = 'https://gerrit.wikimedia.org/r/#/q/' + patchlink.split('/')[-1] + ',n,z'
+                print(f'Patch {patchlink}/{stupid_asshole_patchlink} project: {proj}')
                 crs.execute('''
                     UPDATE patch
                     SET project = ?
                     WHERE link = ?''', (
-                        patch_data['project'],
-                        patch_data['link']
+                        proj,
+                        patchlink
                     )
                 )
+                crs.execute('''
+                    UPDATE patch
+                    SET project = ?
+                    WHERE link = ?''', (
+                        proj,
+                        stupid_asshole_patchlink
+                    )
+                )
+            print('Commit!')
             conn.commit()
             sys.exit(0)
 
@@ -600,7 +625,10 @@ if __name__ == '__main__':
             patches_for_version[version] = patches
             for patch in patches_for_version[version]:
                 print(patch)
-                patch_data = get_patch_info(patch)[0]
+                patch_data = get_patch_info(patch)
+                if patch_data is None:
+                    continue
+                patch_data = patch_data[0]
                 if patch_data is None:
                     continue
                 try:

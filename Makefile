@@ -4,6 +4,7 @@ README.md:
 	jupyter nbconvert README.ipynb --to markdown --output README.md
 
 dumbs:
+	for i in {1..23}; do python3 trainstats.py --tylers-only-do-this -w 1.37.0-wmf.$$i; done
 	for i in {1..38}; do python3 trainstats.py --tylers-only-do-this -w 1.36.0-wmf.$$i; done
 	for i in {1..41}; do python3 trainstats.py --tylers-only-do-this -w 1.35.0-wmf.$$i; done
 	for i in {1..25}; do python3 trainstats.py --tylers-only-do-this -w 1.34.0-wmf.$$i; done
