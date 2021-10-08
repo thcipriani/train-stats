@@ -13,7 +13,7 @@ conn = sqlite3.connect(trainstats.DB_PATH)
 crs = conn.cursor()
 
 patches = crs.execute(
-    'select link from patch where project is null'
+    'select link from patch where project not like "mediawiki%" and project != "VisualEditor/VisualEditor"'
 ).fetchall()
 
 count = 0
@@ -22,8 +22,15 @@ for patch in patches:
     patchid = trainstats.extract_changeid(link)
     patch_data = gerrit.search(patchid)
     patches_len = len(patch_data)
-    patch_data = [p for p in patch_data if p['submitted']][0]
-    project = patch_data['project']
+    found_patch = None
+    for p in patch_data:
+        if not p.get('submitted'):
+            continue
+        print(p['project'])
+        if p['project'].startswith('mediawiki') or p['project'] == 'VisualEditor/VisualEditor':
+            print(p)
+            found_patch = p
+    project = found_patch['project']
     count += 1
 
     print(f'{link} | {patchid} | {project} | match: {patches_len}')
