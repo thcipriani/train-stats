@@ -454,64 +454,6 @@ if __name__ == '__main__':
 
         patches, patch_count = get_patches_for_version(version)
 
-        # This is, hopefully, my one time stupidity
-        # It duplicates code, but it's a one-off thing...don't judge me
-        # Can kill all the code in the block, post migration.
-        if args.tylers_only_do_this:
-            wmf_version = version
-            if not wmf_version.startswith('wmf/'):
-                wmf_version = f'wmf/{wmf_version}'
-            train_bugs = bugs.get_all(wmf_version)
-
-
-            train_bugs = bugs.get_all(wmf_version)
-
-            for bug_id, bug in train_bugs.items():
-                print(f'BACKPORT: {bug["phab"]["url"]} ({bug["patch"]["link"]})')
-                crs.execute('''
-                    UPDATE bug_patch
-                    SET project = ?
-                    WHERE link = ?''', (
-                        bug['patch']['project'],
-                        bug['patch']['link']
-                    )
-                )
-
-            # Handle this stupid fucking goddamn corner case
-            # https://gerrit.wikimedia.org/r/q/1490e9da
-            # https://gerrit.wikimedia.org/r/#/q/1490e9da,n,z
-            for patch in patches:
-                print(patch)
-                patch_data = get_patch_info(patch)
-                if patch_data is None:
-                    continue
-                patch_data = patch_data[0]
-                if patch_data is None:
-                    continue
-                proj = patch_data['project']
-                patchlink = patch.link
-                stupid_asshole_patchlink = 'https://gerrit.wikimedia.org/r/#/q/' + patchlink.split('/')[-1] + ',n,z'
-                print(f'Patch {patchlink}/{stupid_asshole_patchlink} project: {proj}')
-                crs.execute('''
-                    UPDATE patch
-                    SET project = ?
-                    WHERE link = ?''', (
-                        proj,
-                        patchlink
-                    )
-                )
-                crs.execute('''
-                    UPDATE patch
-                    SET project = ?
-                    WHERE link = ?''', (
-                        proj,
-                        stupid_asshole_patchlink
-                    )
-                )
-            print('Commit!')
-            conn.commit()
-            sys.exit(0)
-
         # Don't touch data, just print and exit
         if args.show_rollbacks:
             print(f'START TIME: {start_time}')
