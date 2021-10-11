@@ -29,7 +29,7 @@ class TrainsStats(object):
         for train_stats in trains_stats:
             ts = TrainStats(train_stats)
             self.patches.append(ts.patches)
-            self.rollbacks.append(ts.patches)
+            self.rollbacks.append(ts.rollbacks)
             self.days_delay.append(ts.days_delay)
             self.blocker_count.append(ts.blocker_count)
             self._trains[ts.version] = ts
@@ -152,9 +152,6 @@ def main():
     '''
     ).fetchone()[0]
     return make_train_email(version, crs)
-    print(version)
-    te = TrainEmail(version)
-    return (version, 200)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
