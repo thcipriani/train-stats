@@ -35,10 +35,14 @@ def group_at_time(time, version):
     return -1
 
 
+def get_phab_users(authorPHIDs, phab):
+    return phab.user.search(
+        constraints={'phids': authorPHIDs}
+    )['data']
+
+
 def get_phab_user(authorPHID, phab):
-    user = phab.user.search(
-        constraints={'phids': [authorPHID]}
-    )['data'][0]['fields']
+    user = get_phab_users([authorPHID], phab)[0]['fields']
 
     # TIL this syntax works in python and doesn't return a bool
     return user['realName'] or user['username']
@@ -204,23 +208,23 @@ class TrainBlockers(object):
             'query': 'title:"{} deployment blockers"'.format(self.version)
         }
         try:
-            task_id = self.phab.maniphest.search(
+            task = self.phab.maniphest.search(
                 constraints=constraints,
                 queryKey='k5YunDeBIWUo'
-            )['data'][0]['id']
+            )['data'][0]
         except IndexError:
             # This might be pre 1.31.0 which means it's not a
             # "release" task type, try a different queryKey
-            task_id = self.phab.maniphest.search(
+            task = self.phab.maniphest.search(
                 constraints=constraints,
                 queryKey='guO.3LPHn1Ao'
-            )['data'][0]['id']
-        return task_id
+            )['data'][0]
+        return task
 
     @property
     def blockers(self):
         if not self._blockers:
-            self._parse_blockers(self._get_blockers(self.blocker_task))
+            self._parse_blockers(self._get_blockers(self.blocker_task['id']))
 
         return [b for _, b in self._blockers.items()]
 

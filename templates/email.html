@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset=utf8 />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>🚂🌈Summary of {{train_email.version}} train deployment</title>
+  <style>
+  body {
+    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+    line-height: 1.6em;
+    color: #333;
+    max-width: 85%;
+    margin: 2em auto;
+  }
+  ul, ol { margin: 0; padding: 0; }
+  </style>
+</head>
+<body>
+<h1>🚂🌈Summary of {{train_email.version}} train deployment</h1>
+
+<p>
+This email is a summary of the Wikimedia production deployment of {{version}}
+</p>
+
+<ul>
+    <li>Conductor: {{train_email.conductor}}</li>
+    <li>Backup Conductor: {{train_email.backup}}</li>
+    <li>Blocker Task: <a href="https://phabricator.wikimedia.org/T{{train_email.train_blocker.blocker_task['id']}}">T{{train_email.train_blocker.blocker_task['id']}}</a></li>
+    <li><a href="https://versions.toolforge.org">Current Status</a></li>
+</ul>
+
+{%- set stats_emoji = [
+    "🔢",
+    "📊",
+    "📈",
+    "🧮"
+] %}
+{%- set stats_index =  (range(0, (stats_emoji | length - 1) ) | random) %}
+
+{%- set stats_titles = [
+    "Numbers",
+    "Stats",
+    "By the Numbers",
+    "According to our calculations",
+    "Countin' 'em up"
+] %}
+{%- set stats_titles_index =  (range(0, (stats_titles | length - 1) ) | random) %}
+
+
+<h2>{{stats_emoji[stats_index]}} {{stats_titles[stats_titles_index]}}</h2>
+
+<p>Sparklines comparing with the last 5 trains.</p>
+
+<ul>
+    <li>{{train_email.patches}} Patches {{train_email.stats.patch_sparklines}}</li>
+    <li>{{train_email.rollbacks}} Rollbacks {{train_email.stats.rollbacks_sparklines}}</li>
+    <li>{{train_email.days_delay}} Days of delay {{train_email.stats.days_delay_sparklines}}</li>
+    <li>{{train_email.blocker_count}} Blockers {{train_email.stats.blocker_count_sparklines}}</li>
+</ul>
+
+{%- set trainbow_emoji = [
+    "😻",
+    "🌈",
+    "🎉",
+    "🥰",
+    "✨",
+    "🚂"
+] %}
+{%- set trainbow_index =  (range(0, (trainbow_emoji | length - 1) ) | random) %}
+{%- set trainbow_index_two =  (range(0, (trainbow_emoji | length - 1) ) | random) %}
+
+{%- set trainbow_title = [
+    "Trainlicious Shoutouts",
+    "Trainbow Love",
+    "Traintastic Folks",
+    "Locomotive Love"
+] %}
+{%- set trainbow_title_index =  (range(0, (trainbow_title | length - 1) ) | random) %}
+
+<h2>{{trainbow_emoji[trainbow_index]}} {{trainbow_title[trainbow_title_index]}} {{trainbow_emoji[trainbow_index_two]}}</h2>
+
+Thanks to folks who reported or resolved blockers:
+
+<ul>
+    {%- for thanks in train_email.thanks %}
+    <li>{{thanks}}</li>
+    {%- endfor %}
+</ul>
+
+</body>
+</html>
