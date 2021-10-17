@@ -17,5 +17,5 @@ sshcmd() {
 sshcmd git -C "$WEBROOT" remote update
 sshcmd git -C "$WEBROOT" checkout --force origin/main
 sshcmd git -C "$WEBROOT" status
-sshcmd git -C "$WEBROOT" -c gc.auto gc --auto --quiet
+sshcmd git -C "$WEBROOT" -c gc.auto=128 gc --auto --quiet
 sshcmd webservice --backend=kubernetes python3.7 restart
