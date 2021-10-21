@@ -1,6 +1,20 @@
 #!/usr/bin/env python3
 
 import argparse
+import re
+
+
+def mediawiki_version(version):
+    """
+    Credit: Mukunda Modell
+    """
+    try:
+        return re.match("(\\d+\\.\\d+(\\.\\d+-)?wmf\\.?\\d+)", version).group(0)
+    except AttributeError:
+        raise argparse.ArgumentTypeError(
+            'Invalid wmf version "%s" expected: #.##.#-wmf.#' % version
+        )
+
 
 def parse_args():
     ap = argparse.ArgumentParser()
@@ -10,6 +24,7 @@ def parse_args():
         dest='versions',
         action='append',
         required=True,
+        type=mediawiki_version,
         help='wmf version'
     )
     ap.add_argument(

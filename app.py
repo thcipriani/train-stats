@@ -6,6 +6,8 @@ Train summary email flask app
 Dumps out the skeleton of a train summary email magically!
 """
 
+import argparse
+
 from flask import Flask
 from flask.templating import render_template
 
@@ -133,6 +135,10 @@ class TrainEmail(object):
 
 app = Flask(__name__)
 
+def get_crs(db_path):
+    conn = sqlite3.connect(db_path)
+    return conn.cursor()
+
 def make_train_email(version, crs):
     te = TrainEmail(version, crs)
     return render_template(
@@ -140,11 +146,25 @@ def make_train_email(version, crs):
         train_email=te
     )
 
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
+
+@app.route('/version/<path:version>')
+def version(version):
+    crs = get_crs(trainstats.DB_PATH)
+    try:
+        return make_train_email(version, crs)
+    except argparse.ArgumentTypeError as e:
+        return page_not_found(e)
+
+
 @app.route('/')
 def main():
     # Last train by default
-    conn = sqlite3.connect(trainstats.DB_PATH)
-    crs = conn.cursor()
+    crs = get_crs(trainstats.DB_PATH)
     version = crs.execute('''
         SELECT version
         FROM train
