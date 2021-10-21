@@ -151,7 +151,7 @@ class TrainBlocker(object):
 
 class TrainBlockers(object):
     def __init__(self, version, phab):
-        self.version = version
+        self.version = utils.mediawiki_version(version)
         self.phab = phab
         self._blockers = {}
 
