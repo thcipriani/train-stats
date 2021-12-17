@@ -111,9 +111,9 @@ class TrainEmail(object):
             JOIN blocker b ON b.train_id = t.id
             WHERE version = ?
         ''', (self.version,)).fetchall():
-            if row[0] not in [self.conductor, self.backup]:
+            if row[0] not in [self.conductor, self.backup, 'null']:
                 self.thanks.add(row[0])
-            if row[1] not in [self.conductor, self.backup]:
+            if row[1] not in [self.conductor, self.backup, 'null']:
                 self.thanks.add(row[1])
 
 
