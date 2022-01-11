@@ -307,6 +307,7 @@ def setup_db():
         CREATE TABLE IF NOT EXISTS patch (
             id INTEGER PRIMARY KEY,
             train_id INTEGER NOT NULL,
+            owner TEXT NOT NULL,
             created INTEGER NOT NULL,
             submitted INTEGER NOT NULL,
             insertions INTEGER NOT NULL,
@@ -586,8 +587,9 @@ if __name__ == '__main__':
                             comments,
                             link,
                             time_in_review,
-                            project
-                        ) VALUES(?,?,?,?,?,?,?,?,?,?,?)''', (
+                            project,
+                            owner
+                        ) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)''', (
                             train_id,
                             patch_data['created'],
                             patch_data['submitted'],
@@ -598,7 +600,8 @@ if __name__ == '__main__':
                             patch_data['comments'],
                             patch_data['link'],
                             patch_data['time_in_review'],
-                            patch_data['project']
+                            patch_data['project'],
+                            patch_data['owner']
                         )
                     )
                 # 8: sha1 is not unique
