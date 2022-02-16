@@ -1583,6 +1583,356 @@ train_bugs[train_bugs['version'] == '1.38.0-wmf.21']
 
 
 
+## A look at comments per patch
+
+DCaro made an interesting comment on the [the fame blog](https://phabricator.wikimedia.org/phame/post/view/272/diving_into_our_deployment_data/#4166) about this repo. This is my ham-fisted investigation.
+
+
+```python
+comm_dist = pd.read_sql('select version, sum(comments) as comm from patch p join train t on p.train_id = t.id group by t.version', engine)
+comm_dist.head()
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>version</th>
+      <th>comm</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1.27.0-wmf.16</td>
+      <td>1840</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1.27.0-wmf.17</td>
+      <td>1372</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1.27.0-wmf.18</td>
+      <td>1204</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1.27.0-wmf.19</td>
+      <td>1440</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1.27.0-wmf.20</td>
+      <td>1573</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+comm_dist.set_index('version')['comm'].hist(figsize=(12, 10))
+plt.xlabel("Patch Comments", labelpad=15)
+plt.title("Comments per Train", y=1.02, fontsize=22)
+```
+
+
+
+
+    Text(0.5, 1.02, 'Comments per Train')
+
+
+
+
+    
+![png](README_files/README_33_1.png)
+    
+
+
+
+```python
+pcommdf = pd.read_sql('select link, comments from patch', engine)
+pcommdf.head()
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>link</th>
+      <th>comments</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>https://gerrit.wikimedia.org/r/#/q/ccbfcf28,n,z</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>https://gerrit.wikimedia.org/r/#/q/3302274f,n,z</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>https://gerrit.wikimedia.org/r/#/q/8b5471b5,n,z</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>https://gerrit.wikimedia.org/r/#/q/a6abbb67,n,z</td>
+      <td>15</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>https://gerrit.wikimedia.org/r/#/q/af916aad,n,z</td>
+      <td>3</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+pcommdf.set_index('link')['comments'].hist(figsize=(12, 10),bins=100)
+```
+
+
+
+
+    <AxesSubplot:>
+
+
+
+
+    
+![png](README_files/README_35_1.png)
+    
+
+
+
+```python
+pcommdf.describe()
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>comments</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>count</th>
+      <td>84167.000000</td>
+    </tr>
+    <tr>
+      <th>mean</th>
+      <td>3.666140</td>
+    </tr>
+    <tr>
+      <th>std</th>
+      <td>5.595809</td>
+    </tr>
+    <tr>
+      <th>min</th>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>25%</th>
+      <td>1.000000</td>
+    </tr>
+    <tr>
+      <th>50%</th>
+      <td>2.000000</td>
+    </tr>
+    <tr>
+      <th>75%</th>
+      <td>4.000000</td>
+    </tr>
+    <tr>
+      <th>max</th>
+      <td>354.000000</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+# Let's try to remove huge outliers
+pcommdf[np.abs(pcommdf.comments - pcommdf.comments.mean()) <= (5 * pcommdf.comments.std())]
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>link</th>
+      <th>comments</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>https://gerrit.wikimedia.org/r/#/q/ccbfcf28,n,z</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>https://gerrit.wikimedia.org/r/#/q/3302274f,n,z</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>https://gerrit.wikimedia.org/r/#/q/8b5471b5,n,z</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>https://gerrit.wikimedia.org/r/#/q/a6abbb67,n,z</td>
+      <td>15</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>https://gerrit.wikimedia.org/r/#/q/af916aad,n,z</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>84162</th>
+      <td>https://gerrit.wikimedia.org/r/q/755030</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>84163</th>
+      <td>https://gerrit.wikimedia.org/r/q/759343</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>84164</th>
+      <td>https://gerrit.wikimedia.org/r/q/759296</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>84165</th>
+      <td>https://gerrit.wikimedia.org/r/q/757767</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <th>84166</th>
+      <td>https://gerrit.wikimedia.org/r/q/760273</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+<p>83671 rows × 2 columns</p>
+</div>
+
+
+
+
+```python
+pcommdf[np.abs(pcommdf.comments - pcommdf.comments.mean()) <= (5 * pcommdf.comments.std())].hist(bins=50,figsize=(10, 10))
+plt.xlabel("Distribution of comments on patches", labelpad=15)
+plt.title("Comments per Patch", y=1.02, fontsize=22)
+```
+
+
+
+
+    Text(0.5, 1.02, 'Comments per Patch')
+
+
+
+
+    
+![png](README_files/README_38_1.png)
+    
+
+
 
 ```python
 
