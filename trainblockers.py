@@ -205,7 +205,7 @@ class TrainBlockers(object):
     @property
     def blocker_task(self):
         constraints = {
-            'query': 'title:"{} deployment blockers"'.format(self.version)
+            'query': 'title: {} deployment blockers'.format(self.version)
         }
         try:
             task = self.phab.maniphest.search(
