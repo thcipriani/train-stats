@@ -28,6 +28,17 @@ main() {
     if (( $# < 1 )); then
         usage
         exit 1
+    else
+        version="$@"
+    fi
+
+    if [[ "$version" == "auto" ]]; then
+        version=$(git ls-remote --heads https://gerrit.wikimedia.org/r/mediawiki/core refs/heads/wmf/* | \
+            awk '{print $2}' | \
+            sort --version-sort --reverse | \
+            head -1 | \
+            cut -d'/' -f4
+        )
     fi
 
     if [ ! -d submodules/operations/mediawiki-config ] || [ ! -f trainstats.py ]; then
@@ -36,7 +47,7 @@ main() {
         exit 1
     fi
     submodules
-    newversion "$@"
+    newversion "$version"
 }
 
 main "$@"
