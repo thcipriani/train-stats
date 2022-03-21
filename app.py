@@ -11,7 +11,7 @@ import argparse
 from flask import Flask
 from flask.templating import render_template
 
-from phabricator import Phabricator
+from phabricator import Phabricator, APIError
 from sparklines import sparklines
 import sqlite3
 
@@ -77,14 +77,19 @@ class TrainEmail(object):
         self.version = version
         phab = Phabricator()
         self.train_blocker  = trainblockers.TrainBlockers(self.version, phab)
-        self.conductor = trainblockers.get_phab_user(
-            self.train_blocker.blocker_task['fields']['ownerPHID'],
-            phab
-        )
-        self.backup = trainblockers.get_phab_user(
-            self.train_blocker.blocker_task['fields']['custom.train.backup'][0],
-            phab
-        )
+        try:
+            self.conductor = trainblockers.get_phab_user(
+                self.train_blocker.blocker_task['fields']['ownerPHID'],
+                phab
+            )
+        except APIError:
+            self.conductor = 'Release Engineer Team'
+
+        backups = self.train_blocker.blocker_task['fields']['custom.train.backup']
+        if backups:
+            self.backup = trainblockers.get_phab_user(backups[0], phab)
+        else:
+            self.backup = 'Nobody .·´¯`(>▂<)´¯`·.'
         self.stats = TrainsStats(self.crs.execute('''
             SELECT
                 id,
