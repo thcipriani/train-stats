@@ -12,7 +12,7 @@ import requests
 
 from bs4 import BeautifulSoup
 
-from datetime import date
+from datetime import date, datetime, timedelta
 from distutils.version import LooseVersion
 from statistics import mode
 import sqlite3
@@ -227,7 +227,23 @@ def total_train_time(version, changes):
     sorted_commits = sorted(roll_forwards, key=lambda x: x['commit_date'])
     return sorted_commits[-1]['commit_date'] - sorted_commits[0]['commit_date']
 
-def train_delays(version, changes):
+def group_times(version, changes):
+    groups = [
+        'mediawikiwiki',
+        'commonswiki',
+        'enwiki',
+    ]
+    times = {}
+    for change in sorted(changes, key=lambda x: x['commit_date']):
+        if change['rollforward']:
+            for wiki in groups:
+                if change['wikis'].get(wiki, VersionDiff()).new_version == version:
+                    times[wiki] = datetime.fromtimestamp(change['commit_date'])
+
+    return times
+
+
+def train_delays(groups_times, start_time):
     # Monday = 1; Sunday = 7
     expected = {
         'mediawikiwiki': 2,   # Tuesday
@@ -236,14 +252,16 @@ def train_delays(version, changes):
     }
     # Initialized to preserve the order for return
     delays = { 'mediawikiwiki': 0, 'commonswiki': 0, 'enwiki': 0 }
-    for change in sorted(changes, key=lambda x: x['commit_date']):
-        if change['rollforward']:
-            for wiki, exp in expected.items():
-                if change['wikis'].get(wiki, VersionDiff()).new_version == version:
-                    # Modulo 7 to account for trains that finish the following week
-                    delays[wiki] = (
-                        date.fromtimestamp(change['commit_date']).isoweekday() - exp
-                    ) % 7
+    start_datetime = datetime.fromtimestamp(start_time)
+    for wiki, exp in expected.items():
+        # Modulo 7 to account for trains that finish the following week
+        delay = (
+            groups_times[wiki].isoweekday() - exp
+        ) % 7
+        # If it happens less than a day from the first one, then it's not "delayed"
+        if (groups_times[wiki] - start_datetime).total_seconds() < 86400:
+            delay = 0
+        delays[wiki] = delay
 
     return delays.values()
 
@@ -296,6 +314,8 @@ def setup_db():
             patches INTEGER NOT NULL,
             rollbacks INTEGER NOT NULL,
             rollbacks_time INTEGER NOT NULL,
+            group1 INTEGER NOT NULL,
+            group2 INTEGER NOT NULL,
             group0_delay_days INTEGER NOT NULL,
             group1_delay_days INTEGER NOT NULL,
             group2_delay_days INTEGER NOT NULL,
@@ -450,7 +470,8 @@ if __name__ == '__main__':
         rollbacks = count_rollbacks(version, wikiversion_changes)
         conductor = get_conductor(version, wikiversion_changes)
         rollbacks_time = time_rolledback(version, wikiversion_changes)
-        group0, group1, group2 = train_delays(version, wikiversion_changes)
+        groups_times = group_times(version, wikiversion_changes)
+        group0, group1, group2 = train_delays(groups_times, start_time)
         train_total_time = total_train_time(version, wikiversion_changes)
 
         patches, patch_count = get_patches_for_version(version)
@@ -476,17 +497,21 @@ if __name__ == '__main__':
                     patches,
                     rollbacks,
                     rollbacks_time,
+                    group1,
+                    group2,
                     group0_delay_days,
                     group1_delay_days,
                     group2_delay_days,
                     total_time)
-                VALUES(?,?,?,?,?,?,?,?,?,?)''', (
+                VALUES(?,?,?,?,?,?,?,?,?,?,?,?)''', (
                     start_time,
                     version,
                     conductor,
                     patch_count,
                     rollbacks,
                     rollbacks_time,
+                    groups_times['commonswiki'],
+                    groups_times['enwiki'],
                     group0,
                     group1,
                     group2,
