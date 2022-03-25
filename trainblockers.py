@@ -204,21 +204,24 @@ class TrainBlockers(object):
 
     @property
     def blocker_task(self):
-        constraints = {
-            'query': 'title: {} deployment blockers'.format(self.version)
-        }
-        try:
-            task = self.phab.maniphest.search(
-                constraints=constraints,
-                queryKey='k5YunDeBIWUo'
-            )['data'][0]
-        except IndexError:
+        tasks = self.phab.maniphest.search(
+            queryKey='k5YunDeBIWUo'
+        )['data']
+
+        if not tasks:
             # This might be pre 1.31.0 which means it's not a
             # "release" task type, try a different queryKey
-            task = self.phab.maniphest.search(
-                constraints=constraints,
+            tasks = self.phab.maniphest.search(
                 queryKey='guO.3LPHn1Ao'
-            )['data'][0]
+            )['data']
+
+        for blocker_task in tasks:
+            if self.version in blocker_task['fields']['name']:
+                task = blocker_task
+
+        if not task:
+            raise RuntimeError('Blocker not found')
+
         return task
 
     @property
