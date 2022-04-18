@@ -191,6 +191,7 @@ fig, ax = plt.subplots(figsize=(10,10))         # Sample figsize in inches
 sns.heatmap(df.corr(), annot=True, cmap="YlGnBu", linewidths=0.3, annot_kws={"size": 8}, ax=ax)
 plt.xticks(rotation=90)
 plt.yticks(rotation=0)
+plt.title('Correlation of train variables')
 plt.show()
 ```
 
@@ -1185,15 +1186,23 @@ from matplotlib import ticker as mticker
 import numpy as np
 
 # Adapted from <https://stackoverflow.com/a/60132262>
-fig, ax = plt.subplots(1, 3, sharey=True, figsize=(20,10))
+fig, ax = plt.subplots(1, 3, sharey=True, figsize=(20,10), constrained_layout=True)
+plt.tight_layout(pad=5)
 sns.violinplot(data=cycle,x='version', y='lead_time_days', ax=ax[0])
 sns.swarmplot(data=cycle,x='version', y='lead_time_days', ax=ax[1])
 sns.stripplot(data=cycle,x='version', y='lead_time_days', ax=ax[2])
+ax[0].set_ylabel('Time from merge to deploy (days)', labelpad=20.0)
+ax[1].set_ylabel('')
+ax[2].set_ylabel('')
 ax[0].yaxis.set_major_formatter(mticker.StrMethodFormatter("{x}"))
+
+plt.suptitle('Lead time of changes per version', x=0.02, y=.92, ha='left', fontsize=25)
 plt.show()
 ```
 
-    /usr/lib/python3/dist-packages/seaborn/categorical.py:1296: UserWarning: 16.4% of the points cannot be placed; you may want to decrease the size of the markers or use stripplot.
+    /tmp/ipykernel_1460620/2853478908.py:6: UserWarning: This figure was using constrained_layout, but that is incompatible with subplots_adjust and/or tight_layout; disabling constrained_layout.
+      plt.tight_layout(pad=5)
+    /usr/lib/python3/dist-packages/seaborn/categorical.py:1296: UserWarning: 17.2% of the points cannot be placed; you may want to decrease the size of the markers or use stripplot.
       warnings.warn(msg, UserWarning)
 
 
@@ -1208,7 +1217,10 @@ plt.show()
 fig, ax = plt.subplots(1, 1, sharey=True, figsize=(20,10))
 ax.set_yscale('log')
 sns.stripplot(data=cycle,x='version', y='lead_time_days', ax=ax)
+ax.set_ylabel('Time from merge to deploy (days)', labelpad=20.0)
+
 ax.yaxis.set_major_formatter(mticker.StrMethodFormatter("{x}"))
+plt.suptitle('Lead time of changes per version (log scale)', x=0.02, y=.92, ha='left', fontsize=25)
 plt.show()
 ```
 
@@ -1232,7 +1244,11 @@ fig, ax = plt.subplots(1, 3, sharey=True, figsize=(20,10))
 sns.violinplot(data=cycle,x='version', y='cycle_time_days', ax=ax[0])
 sns.swarmplot(data=cycle,x='version', y='cycle_time_days', ax=ax[1])
 sns.stripplot(data=cycle,x='version', y='cycle_time_days', ax=ax[2])
+ax[0].set_ylabel('Time from patch creation to deploy (days)', labelpad=20.0)
+ax[1].set_ylabel('')
+ax[2].set_ylabel('')
 ax[0].yaxis.set_major_formatter(mticker.StrMethodFormatter("{x}"))
+plt.suptitle('Cycle time of changes per version', x=0.02, y=.92, ha='left', fontsize=25)
 plt.show()
 ```
 
@@ -1259,7 +1275,9 @@ It's hard to see the majority of our patch's cycletime with the outliers. Here's
 fig, ax = plt.subplots(1, 1, sharey=True, figsize=(20,10))
 ax.set_yscale('log')
 sns.stripplot(data=cycle,x='version', y='cycle_time_days', ax=ax)
+ax.set_ylabel('Time from patch creation to deploy (days)', labelpad=20.0)
 ax.yaxis.set_major_formatter(mticker.StrMethodFormatter("{x}"))
+plt.suptitle('Cycle time of changes per version (log scale)', x=0.02, y=.92, ha='left', fontsize=25)
 plt.show()
 ```
 
@@ -1365,12 +1383,13 @@ Seems to follow the power law
 
 ```python
 train_bugs.hist()
+plt.title('Bug count per train')
 ```
 
 
 
 
-    array([[<AxesSubplot:title={'center':'bug_count'}>]], dtype=object)
+    Text(0.5, 1.0, 'Bug count per train')
 
 
 
