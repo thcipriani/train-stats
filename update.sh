@@ -24,6 +24,13 @@ newversion() {
     python3 trainstats.py -w "$version"
 }
 
+update_trains() {
+    local version trains
+    version="$1"
+    trains=$(tail +2 data/TRAINS)
+    printf "%s\n%s" "$trains" "$version" > data/TRAINS
+}
+
 main() {
     if (( $# < 1 )); then
         usage
@@ -48,6 +55,9 @@ main() {
     fi
     submodules
     newversion "$version"
+    update_trains "$version"
+    make README.ipynb
+    make README.md
 }
 
 main "$@"
