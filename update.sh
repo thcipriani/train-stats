@@ -18,9 +18,9 @@ commit() {
 }
 
 submodules() {
-    git -C submodules/operations/mediawiki-config fetch
-    git -C submodules/operations/mediawiki-config rebase
-    commit 'Bump operations/mediawiki-config'
+    git -C submodules/operations/mediawiki-config fetch || :
+    git -C submodules/operations/mediawiki-config rebase || :
+    commit 'Bump operations/mediawiki-config' || :
 }
 
 newversion() {
