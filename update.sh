@@ -11,11 +11,16 @@ usage() {
 USE
 }
 
+commit() {
+    local msg
+    msg="$@"
+    git commit -a -m "$msg"
+}
+
 submodules() {
     git -C submodules/operations/mediawiki-config fetch
     git -C submodules/operations/mediawiki-config rebase
-    git add submodules
-    git commit -m 'Bump operations/mediawiki-config'
+    commit 'Bump operations/mediawiki-config'
 }
 
 newversion() {
@@ -58,6 +63,7 @@ main() {
     update_trains "$version"
     make README.ipynb
     make README.md
+    commit "./update.sh $version"
 }
 
 main "$@"
