@@ -53,6 +53,13 @@ main() {
         )
     fi
 
+    indb=$(printf 'select version from train where version = "%s"\n' "$version" | sqlite3 data/train.db)
+
+    if [[ "$indb" == "$version" ]]; then
+        printf '"%s" in Database. Nothing to do. Exiting...\n' "$version"
+        exit 0
+    fi
+
     if [ ! -d submodules/operations/mediawiki-config ] || [ ! -f trainstats.py ]; then
         echo "You're running this from the wrong directory, bub"
         usage
