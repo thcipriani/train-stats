@@ -6,7 +6,7 @@
 
 set -euo pipefail
 
-HOST=tools-login.wmflabs.org
+HOST=login.toolforge.org
 USER=tools.trainbow
 WEBROOT=/data/project/trainbow/www/python/src
 
