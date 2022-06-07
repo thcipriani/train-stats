@@ -19,7 +19,7 @@ commit() {
 
 submodules() {
     git -C submodules/operations/mediawiki-config fetch || :
-    git -C submodules/operations/mediawiki-config rebase || :
+    git -C submodules/operations/mediawiki-config checkout --force origin/master || :
     commit 'Bump operations/mediawiki-config' || :
 }
 

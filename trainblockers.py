@@ -21,7 +21,7 @@ def group_at_time(time, version):
     group2 = 'enwiki'
 
     rev = subprocess.check_output([
-        'git', '-C', git.MWCONFIG_PATH, 'rev-list', '-1', '--before', time, r'@{u}'
+        'git', '-C', git.MWCONFIG_PATH, 'rev-list', '-1', '--before', time, 'origin/master'
     ]).decode('utf8').strip()
     wikiversions = json.loads(subprocess.check_output([
         'git', '-C', git.MWCONFIG_PATH, 'show', '{}:wikiversions.json'.format(rev)
