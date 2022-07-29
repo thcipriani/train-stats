@@ -26,7 +26,7 @@ import utils
 BASE_URL = 'https://www.mediawiki.org/wiki/'
 FMT_URL = 'MediaWiki_{}/Changelog'
 
-DB_PATH = './data/train.db'
+DB_PATH = os.path.join(os.path.dirname(__file__), 'data', 'train.db')
 
 
 class VersionDiff(object):

@@ -26,15 +26,19 @@ submodules() {
 }
 
 newversion() {
-    local version
+    local version python
     version="$1"
+    p=python3
     if [ -d "$SCRIPT_DIR"/venv ]; then
         . "$SCRIPT_DIR"/venv/bin/activate
-    fi
-    if [ -d "$SCRIPT_DIR"/../venv ]; then
+        p="$SCRIPT_DIR"/venv/bin/python3
+        echo 'Activating magic 1'
+    elif [ -d "$SCRIPT_DIR"/../venv ]; then
         . "$SCRIPT_DIR"/../venv/bin/activate
+        p="$SCRIPT_DIR"/../venv/bin/python3
+        echo 'Activating magic 2'
     fi
-    python3 "$SCRIPT_DIR"/trainstats.py -w "$version"
+    $p "$SCRIPT_DIR"/trainstats.py -w "$version"
 }
 
 update_trains() {

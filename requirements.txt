@@ -1,0 +1,12 @@
+phabricator
+flask
+sparklines
+beautifulsoup4
+python-dateutil
+requests
+jupyter
+matplotlib
+pandas
+seaborn
+sqlalchemy
+numpy
