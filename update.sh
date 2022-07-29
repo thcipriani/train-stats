@@ -28,6 +28,9 @@ submodules() {
 newversion() {
     local version
     version="$1"
+    if [ -d "$SCRIPT_DIR"/venv ]; then
+        . "$SCRIPT_DIR"/venv/bin/activate
+    fi
     python3 "$SCRIPT_DIR"/trainstats.py -w "$version"
 }
 
