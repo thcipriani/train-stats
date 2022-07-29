@@ -53,7 +53,7 @@ main() {
         )
     fi
 
-    indb=$(printf 'select version from train where version = "%s"\n' "$version" | sqlite3 data/train.db)
+    indb=$(./scripts/get_version.py "$version")
 
     if [[ "$indb" == "$version" ]]; then
         printf '"%s" in Database. Nothing to do. Exiting...\n' "$version"
