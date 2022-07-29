@@ -16,26 +16,26 @@ USE
 commit() {
     local msg
     msg="$@"
-    git commit -a -m "$msg"
+    git -C "$SCRIPT_DIR" commit -a -m "$msg"
 }
 
 submodules() {
-    git -C submodules/operations/mediawiki-config fetch || :
-    git -C submodules/operations/mediawiki-config checkout --force origin/master || :
+    git -C "$SCRIPT_DIR"/submodules/operations/mediawiki-config fetch || :
+    git -C "$SCRIPT_DIR"/submodules/operations/mediawiki-config checkout --force origin/master || :
     commit 'Bump operations/mediawiki-config' || :
 }
 
 newversion() {
     local version
     version="$1"
-    python3 trainstats.py -w "$version"
+    python3 "$SCRIPT_DIR"/trainstats.py -w "$version"
 }
 
 update_trains() {
     local version trains
     version="$1"
-    trains=$(tail +2 data/TRAINS)
-    printf "%s\n%s" "$trains" "$version" > data/TRAINS
+    trains=$(tail +2 "$SCRIPT_DIR"/data/TRAINS)
+    printf "%s\n%s" "$trains" "$version" > "$SCRIPT_DIR"/data/TRAINS
 }
 
 main() {
@@ -62,14 +62,10 @@ main() {
         exit 0
     fi
 
-    if [ ! -d submodules/operations/mediawiki-config ] || [ ! -f trainstats.py ]; then
-        echo "You're running this from the wrong directory, bub"
-        usage
-        exit 1
-    fi
     submodules
     newversion "$version"
     update_trains "$version"
+    cd "$SCRIPT_DIR"
     make README.ipynb
     make README.md
     commit "./update.sh $version"
