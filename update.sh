@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
 usage() {
     cat<<USE
     USAGE:
@@ -53,7 +55,7 @@ main() {
         )
     fi
 
-    indb=$(./scripts/get_version.py "$version")
+    indb=$("$SCRIPT_DIR"/scripts/get_version.py "$version")
 
     if [[ "$indb" == "$version" ]]; then
         printf '"%s" in Database. Nothing to do. Exiting...\n' "$version"
