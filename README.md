@@ -2037,6 +2037,174 @@ plt.title("Comments per Patch", y=1.02, fontsize=22)
     
 
 
+## Patch authors per train
+
+
+```python
+patch_authors = pd.read_sql('''
+SELECT train.version,
+    COUNT(DISTINCT patch.owner) as unique_owners
+    FROM train
+    JOIN patch ON train.id = patch.train_id
+    GROUP BY train.id
+    ORDER BY start_time;
+''', engine)
+patch_authors.head()
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>version</th>
+      <th>unique_owners</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1.27.0-wmf.16</td>
+      <td>65</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1.27.0-wmf.17</td>
+      <td>60</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1.27.0-wmf.18</td>
+      <td>61</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1.27.0-wmf.19</td>
+      <td>67</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1.27.0-wmf.20</td>
+      <td>71</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+patch_authors.set_index('version').unique_owners.plot(linewidth=1)
+plt.xticks(rotation=90)
+```
+
+
+
+
+    (array([-50.,   0.,  50., 100., 150., 200., 250., 300., 350.]),
+     [Text(-50.0, 0, '1.39.0-wmf.1'),
+      Text(0.0, 0, '1.27.0-wmf.16'),
+      Text(50.0, 0, '1.30.0-wmf.6'),
+      Text(100.0, 0, '1.32.0-wmf.23'),
+      Text(150.0, 0, '1.35.0-wmf.11'),
+      Text(200.0, 0, '1.36.0-wmf.32'),
+      Text(250.0, 0, '1.39.0-wmf.5'),
+      Text(300.0, 0, ''),
+      Text(350.0, 0, '')])
+
+
+
+
+    
+![png](README_files/README_45_1.png)
+    
+
+
+
+```python
+patch_authors.describe()
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>unique_owners</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>count</th>
+      <td>296.000000</td>
+    </tr>
+    <tr>
+      <th>mean</th>
+      <td>66.844595</td>
+    </tr>
+    <tr>
+      <th>std</th>
+      <td>11.792680</td>
+    </tr>
+    <tr>
+      <th>min</th>
+      <td>11.000000</td>
+    </tr>
+    <tr>
+      <th>25%</th>
+      <td>59.000000</td>
+    </tr>
+    <tr>
+      <th>50%</th>
+      <td>67.000000</td>
+    </tr>
+    <tr>
+      <th>75%</th>
+      <td>74.000000</td>
+    </tr>
+    <tr>
+      <th>max</th>
+      <td>108.000000</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
 
 ```python
 
