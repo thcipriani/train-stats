@@ -187,6 +187,34 @@ df.head()
 
 
 ```python
+df.set_index('version').patches.plot(linewidth=1)
+plt.xticks(rotation=90)
+```
+
+
+
+
+    (array([-50.,   0.,  50., 100., 150., 200., 250., 300., 350.]),
+     [Text(-50.0, 0, '1.39.0-wmf.1'),
+      Text(0.0, 0, '1.37.0-wmf.1'),
+      Text(50.0, 0, '1.35.0-wmf.23'),
+      Text(100.0, 0, '1.33.0-wmf.19'),
+      Text(150.0, 0, '1.37.0-wmf.9'),
+      Text(200.0, 0, '1.29.0-wmf.12'),
+      Text(250.0, 0, '1.39.0-wmf.1'),
+      Text(300.0, 0, ''),
+      Text(350.0, 0, '')])
+
+
+
+
+    
+![png](README_files/README_2_1.png)
+    
+
+
+
+```python
 fig, ax = plt.subplots(figsize=(10,10))         # Sample figsize in inches
 sns.heatmap(df.corr(), annot=True, cmap="YlGnBu", linewidths=0.3, annot_kws={"size": 8}, ax=ax)
 plt.xticks(rotation=90)
@@ -195,9 +223,13 @@ plt.title('Correlation of train variables')
 plt.show()
 ```
 
+    /tmp/ipykernel_1237903/451809946.py:2: FutureWarning: The default value of numeric_only in DataFrame.corr is deprecated. In a future version, it will default to False. Select only valid columns or specify the value of numeric_only to silence this warning.
+      sns.heatmap(df.corr(), annot=True, cmap="YlGnBu", linewidths=0.3, annot_kws={"size": 8}, ax=ax)
+
+
 
     
-![png](README_files/README_2_0.png)
+![png](README_files/README_3_1.png)
     
 
 
@@ -217,7 +249,7 @@ plt.title("Blockers per Train", y=1.02, fontsize=22)
 
 
     
-![png](README_files/README_3_1.png)
+![png](README_files/README_4_1.png)
     
 
 
@@ -672,7 +704,7 @@ plt.show()
 
 
     
-![png](README_files/README_10_0.png)
+![png](README_files/README_11_0.png)
     
 
 
@@ -1227,7 +1259,7 @@ plt.show()
 
 
     
-![png](README_files/README_20_1.png)
+![png](README_files/README_21_1.png)
     
 
 
@@ -1245,7 +1277,7 @@ plt.show()
 
 
     
-![png](README_files/README_21_0.png)
+![png](README_files/README_22_0.png)
     
 
 
@@ -1281,7 +1313,7 @@ plt.show()
 
 
     
-![png](README_files/README_23_1.png)
+![png](README_files/README_24_1.png)
     
 
 
@@ -1302,7 +1334,7 @@ plt.show()
 
 
     
-![png](README_files/README_25_0.png)
+![png](README_files/README_26_0.png)
     
 
 
@@ -1414,7 +1446,7 @@ plt.title('Bug count per train')
 
 
     
-![png](README_files/README_29_1.png)
+![png](README_files/README_30_1.png)
     
 
 
@@ -1608,7 +1640,7 @@ plt.show()
 
 
     
-![png](README_files/README_32_0.png)
+![png](README_files/README_33_0.png)
     
 
 
@@ -1738,7 +1770,7 @@ plt.title("Comments per Train", y=1.02, fontsize=22)
 
 
     
-![png](README_files/README_36_1.png)
+![png](README_files/README_37_1.png)
     
 
 
@@ -1819,7 +1851,7 @@ pcommdf.set_index('link')['comments'].hist(figsize=(12, 10),bins=100)
 
 
     
-![png](README_files/README_38_1.png)
+![png](README_files/README_39_1.png)
     
 
 
@@ -2001,7 +2033,7 @@ plt.title("Comments per Patch", y=1.02, fontsize=22)
 
 
     
-![png](README_files/README_41_1.png)
+![png](README_files/README_42_1.png)
     
 
 
