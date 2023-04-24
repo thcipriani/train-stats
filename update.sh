@@ -57,7 +57,7 @@ main() {
     fi
 
     if [[ "$version" == "auto" ]]; then
-        version=$(git ls-remote --heads https://gerrit.wikimedia.org/r/mediawiki/core refs/heads/wmf/* | \
+        version=$(git ls-remote --heads https://gerrit.wikimedia.org/r/mediawiki/core refs/heads/wmf/1* | \
             awk '{print $2}' | \
             sort --version-sort --reverse | \
             head -1 | \
