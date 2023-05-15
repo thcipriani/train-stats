@@ -1246,7 +1246,7 @@ plt.suptitle('Lead time of changes per version', x=0.02, y=.92, ha='left', fonts
 plt.show()
 ```
 
-    /tmp/ipykernel_366169/2853478908.py:6: UserWarning: The figure layout has changed to tight
+    /tmp/ipykernel_368860/2853478908.py:6: UserWarning: The figure layout has changed to tight
       plt.tight_layout(pad=5)
     /home/thcipriani/Projects/Wikimedia/train-stats/venv/lib/python3.11/site-packages/seaborn/categorical.py:3544: UserWarning: 5.7% of the points cannot be placed; you may want to decrease the size of the markers or use stripplot.
       warnings.warn(msg, UserWarning)
@@ -1264,7 +1264,7 @@ plt.show()
 ```python
 fig, ax = plt.subplots(1, 1, sharey=True, figsize=(20,10))
 ax.set_yscale('log')
-sns.stripplot(data=cycle,x='version', y='lead_time_days', ax=ax)
+sns.violinplot(data=cycle,x='version', y='lead_time_days', ax=ax)
 ax.set_ylabel('Time from merge to deploy (days)', labelpad=20.0)
 
 ax.yaxis.set_major_formatter(mticker.StrMethodFormatter("{x}"))
@@ -1326,7 +1326,7 @@ It's hard to see the majority of our patch's cycletime with the outliers. Here's
 ```python
 fig, ax = plt.subplots(1, 1, sharey=True, figsize=(20,10))
 ax.set_yscale('log')
-sns.stripplot(data=cycle,x='version', y='cycle_time_days', ax=ax)
+sns.violinplot(data=cycle,x='version', y='cycle_time_days', ax=ax)
 ax.set_ylabel('Time from patch creation to deploy (days)', labelpad=20.0)
 ax.yaxis.set_major_formatter(mticker.StrMethodFormatter("{x}"))
 plt.suptitle('Cycle time of changes per version (log scale)', x=0.02, y=.92, ha='left', fontsize=25)
