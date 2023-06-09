@@ -2247,6 +2247,10 @@ sns.jointplot(data=train_bugs, x='patches', y='resolved_blockers', kind='reg')
     
 
 
+## Bugs escaping into production
+
+Everytime we backport a fix, it counts as a bug. And it's a bug we missed before the code went to production. This is known as an "escape."
+
 
 ```python
 escapes = pd.read_sql('''
@@ -2410,24 +2414,6 @@ df_escapes.head()
 
 
 ```python
-sns.lineplot(df_escapes, x='version', y='counts')
-```
-
-
-
-
-    <AxesSubplot: xlabel='version', ylabel='counts'>
-
-
-
-
-    
-![png](README_files/README_51_1.png)
-    
-
-
-
-```python
 df_escapes = df_escapes.reset_index()
 df_escapes.head()
 ```
@@ -2558,7 +2544,7 @@ df_escapes.head()
 import numpy as np
 
 # Select a subset of versions to display
-subset_versions = df_escapes['version'].unique()[::10]  # Select every 10th version
+subset_versions = df_escapes['version'].unique()[::1]  # Every version...just make a copy
 
 # Filter the DataFrame to include only the subset of versions
 df_subset = df_escapes[df_escapes['version'].isin(subset_versions)]
@@ -2568,7 +2554,7 @@ x = df_subset['version']
 y = df_subset['counts']
 
 # Create a figure and axis
-fig, ax = plt.subplots()
+fig, ax = plt.subplots(figsize=(12, 8))
 
 # Plot the line plot
 ax.plot(x, y, marker='o', linestyle='-', label='Data')
@@ -2578,13 +2564,18 @@ coefficients = np.polyfit(np.arange(len(x)), y, deg=1)
 trendline = np.poly1d(coefficients)
 ax.plot(x, trendline(np.arange(len(x))), linestyle='--', label='Trend Line')
 
+# Calculate the slope of the trend line
+slope = coefficients[0]
+
 # Set labels and title
 ax.set_xlabel('Version')
 ax.set_ylabel('Counts')
-ax.set_title('Trend Plot of Escapes by Version')
+ax.set_title(f'Trend Plot of Escapes by Version\nSlope: {slope:.2f} escapes per version')
 
-# Rotate x-axis labels if needed
-plt.xticks(rotation=45)
+# Reduce the number of x-axis tick labels
+tick_positions = np.arange(0, len(x), step=20)  # Adjust the step value to show desired number of labels
+tick_labels = x[tick_positions]
+plt.xticks(tick_positions, tick_labels, rotation=45)
 
 # Display legend
 ax.legend()
