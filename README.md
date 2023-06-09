@@ -2249,5 +2249,352 @@ sns.jointplot(data=train_bugs, x='patches', y='resolved_blockers', kind='reg')
 
 
 ```python
-
+escapes = pd.read_sql('''
+select
+  version,
+  b.link
+from
+  bug_train bt
+  join train t on t.id = bt.train_id
+  join bug b on bt.bug_id = b.id
+  join bug_bug_patch bbp on bbp.bug_id = b.id
+  join bug_patch bp on bp.id = bbp.bug_patch_id
+  join bug_file bf on bp.id = bf.bug_patch_id
+group by
+  version, b.link;
+''', engine)
+escapes.head()
 ```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>version</th>
+      <th>link</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1.27.0-wmf.16</td>
+      <td>https://phabricator.wikimedia.org/T129641</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1.27.0-wmf.16</td>
+      <td>https://phabricator.wikimedia.org/T129704</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1.27.0-wmf.16</td>
+      <td>https://phabricator.wikimedia.org/T129715</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1.27.0-wmf.19</td>
+      <td>https://phabricator.wikimedia.org/T131283</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1.27.0-wmf.21</td>
+      <td>https://phabricator.wikimedia.org/T132645</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+escapes.version.value_counts()
+```
+
+
+
+
+    1.34.0-wmf.13    13
+    1.32.0-wmf.24    11
+    1.37.0-wmf.20    11
+    1.34.0-wmf.11    11
+    1.37.0-wmf.5     11
+                     ..
+    1.30.0-wmf.11     1
+    1.29.0-wmf.5      1
+    1.39.0-wmf.28     1
+    1.39.0-wmf.3      1
+    1.31.0-wmf.25     1
+    Name: version, Length: 287, dtype: int64
+
+
+
+
+```python
+df_escapes = escapes.version.value_counts(dropna=True, sort=False).rename_axis('version').to_frame('counts')
+# sns.lineplot(df_escapes, x='version')
+df_escapes.head()
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>counts</th>
+    </tr>
+    <tr>
+      <th>version</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1.27.0-wmf.16</th>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>1.27.0-wmf.19</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>1.27.0-wmf.21</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>1.27.0-wmf.22</th>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>1.27.0-wmf.23</th>
+      <td>3</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+sns.lineplot(df_escapes, x='version', y='counts')
+```
+
+
+
+
+    <AxesSubplot: xlabel='version', ylabel='counts'>
+
+
+
+
+    
+![png](README_files/README_51_1.png)
+    
+
+
+
+```python
+df_escapes = df_escapes.reset_index()
+df_escapes.head()
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>version</th>
+      <th>counts</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1.27.0-wmf.16</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1.27.0-wmf.19</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1.27.0-wmf.21</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1.27.0-wmf.22</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1.27.0-wmf.23</td>
+      <td>3</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+df_escapes['counts'] = pd.to_numeric(df_escapes['counts'], errors='coerce')
+df_escapes['version'] = df_escapes['version'].astype(str)
+df_escapes.head()
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>version</th>
+      <th>counts</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1.27.0-wmf.16</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1.27.0-wmf.19</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1.27.0-wmf.21</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1.27.0-wmf.22</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1.27.0-wmf.23</td>
+      <td>3</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+import numpy as np
+
+# Select a subset of versions to display
+subset_versions = df_escapes['version'].unique()[::10]  # Select every 10th version
+
+# Filter the DataFrame to include only the subset of versions
+df_subset = df_escapes[df_escapes['version'].isin(subset_versions)]
+
+# Extract x and y values from the DataFrame
+x = df_subset['version']
+y = df_subset['counts']
+
+# Create a figure and axis
+fig, ax = plt.subplots()
+
+# Plot the line plot
+ax.plot(x, y, marker='o', linestyle='-', label='Data')
+
+# Calculate the trend line using polynomial regression (degree=1)
+coefficients = np.polyfit(np.arange(len(x)), y, deg=1)
+trendline = np.poly1d(coefficients)
+ax.plot(x, trendline(np.arange(len(x))), linestyle='--', label='Trend Line')
+
+# Set labels and title
+ax.set_xlabel('Version')
+ax.set_ylabel('Counts')
+ax.set_title('Trend Plot of Escapes by Version')
+
+# Rotate x-axis labels if needed
+plt.xticks(rotation=45)
+
+# Display legend
+ax.legend()
+
+# Show the plot
+plt.show()
+```
+
+
+    
+![png](README_files/README_54_0.png)
+    
+
