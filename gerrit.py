@@ -192,7 +192,8 @@ def search(change_id=None, branch=None, changelog_item=None):
                         and msg.get('author', {}).get('_account_id', 75) != 75
                     )
                 ]),
-                'link': os.path.join(URL, str(patch_json['_number']))
+                'link': os.path.join(URL, str(patch_json['_number'])),
+                'patchset': patch_json['_number'],
             }
         except:
             import pdb

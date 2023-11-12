@@ -336,6 +336,7 @@ def setup_db():
             patch_deps INTEGER NOT NULL,
             comments INTEGER NOT NULL,
             link TEXT UNIQUE NOT NULL,
+            patchset INTEGER NOT NULL,
             time_in_review INTEGER NOT NULL,
             FOREIGN KEY(train_id) REFERENCES train(id)
         );
@@ -611,10 +612,11 @@ if __name__ == '__main__':
                             patch_deps,
                             comments,
                             link,
+                            patchset,
                             time_in_review,
                             project,
                             owner
-                        ) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)''', (
+                        ) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)''', (
                             train_id,
                             patch_data['created'],
                             patch_data['submitted'],
@@ -624,6 +626,7 @@ if __name__ == '__main__':
                             patch_data['patch_deps'],
                             patch_data['comments'],
                             patch_data['link'],
+                            patch_data['patchset'],
                             patch_data['time_in_review'],
                             patch_data['project'],
                             patch_data['owner']
