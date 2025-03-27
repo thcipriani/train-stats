@@ -771,21 +771,21 @@ patches.describe()
   <tbody>
     <tr>
       <th>count</th>
-      <td>1.316180e+05</td>
-      <td>1.316180e+05</td>
-      <td>1.316180e+05</td>
+      <td>1.322090e+05</td>
+      <td>1.322090e+05</td>
+      <td>1.322090e+05</td>
     </tr>
     <tr>
       <th>mean</th>
-      <td>1.605722e+09</td>
-      <td>2.831665e+02</td>
-      <td>-2.173177e+02</td>
+      <td>1.606334e+09</td>
+      <td>2.821675e+02</td>
+      <td>-2.165016e+02</td>
     </tr>
     <tr>
       <th>std</th>
-      <td>7.994824e+07</td>
-      <td>4.789463e+04</td>
-      <td>4.586765e+04</td>
+      <td>8.028980e+07</td>
+      <td>4.778746e+04</td>
+      <td>4.576502e+04</td>
     </tr>
     <tr>
       <th>min</th>
@@ -795,25 +795,25 @@ patches.describe()
     </tr>
     <tr>
       <th>25%</th>
-      <td>1.540365e+09</td>
+      <td>1.540672e+09</td>
       <td>2.000000e+00</td>
       <td>-1.800000e+01</td>
     </tr>
     <tr>
       <th>50%</th>
-      <td>1.599876e+09</td>
+      <td>1.600362e+09</td>
       <td>7.000000e+00</td>
       <td>-4.000000e+00</td>
     </tr>
     <tr>
       <th>75%</th>
-      <td>1.678239e+09</td>
+      <td>1.678998e+09</td>
       <td>3.500000e+01</td>
       <td>-1.000000e+00</td>
     </tr>
     <tr>
       <th>max</th>
-      <td>1.742286e+09</td>
+      <td>1.742891e+09</td>
       <td>1.728860e+07</td>
       <td>0.000000e+00</td>
     </tr>
@@ -991,53 +991,53 @@ cycle.head()
   <tbody>
     <tr>
       <th>0</th>
-      <td>wmf.19</td>
-      <td>2025-03-04 04:01:33</td>
-      <td>40009</td>
-      <td>11448</td>
-      <td>2025-03-03 16:54:44</td>
-      <td>2025-03-04 00:50:45</td>
-      <td>https://gerrit.wikimedia.org/r/1124053</td>
+      <td>wmf.20</td>
+      <td>2025-03-11 03:02:12</td>
+      <td>16603</td>
+      <td>13624</td>
+      <td>2025-03-10 22:25:29</td>
+      <td>2025-03-10 23:15:08</td>
+      <td>https://gerrit.wikimedia.org/r/1126097</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>wmf.19</td>
-      <td>2025-03-04 04:01:33</td>
-      <td>1092251</td>
-      <td>14802</td>
-      <td>2025-02-19 12:37:22</td>
-      <td>2025-03-03 23:54:51</td>
-      <td>https://gerrit.wikimedia.org/r/1120705</td>
+      <td>wmf.20</td>
+      <td>2025-03-11 03:02:12</td>
+      <td>1474060</td>
+      <td>14087</td>
+      <td>2025-02-22 01:34:32</td>
+      <td>2025-03-10 23:07:25</td>
+      <td>https://gerrit.wikimedia.org/r/1121680</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>wmf.19</td>
-      <td>2025-03-04 04:01:33</td>
-      <td>82468</td>
-      <td>45139</td>
-      <td>2025-03-03 05:07:05</td>
-      <td>2025-03-03 15:29:14</td>
-      <td>https://gerrit.wikimedia.org/r/1123808</td>
+      <td>wmf.20</td>
+      <td>2025-03-11 03:02:12</td>
+      <td>27882</td>
+      <td>21983</td>
+      <td>2025-03-10 19:17:30</td>
+      <td>2025-03-10 20:55:49</td>
+      <td>https://gerrit.wikimedia.org/r/1126039</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>wmf.19</td>
-      <td>2025-03-04 04:01:33</td>
-      <td>673876</td>
-      <td>64516</td>
-      <td>2025-02-24 08:50:17</td>
-      <td>2025-03-03 10:06:17</td>
-      <td>https://gerrit.wikimedia.org/r/1121793</td>
+      <td>wmf.20</td>
+      <td>2025-03-11 03:02:12</td>
+      <td>5123201</td>
+      <td>4020</td>
+      <td>2025-01-10 19:55:31</td>
+      <td>2025-03-11 01:55:12</td>
+      <td>https://gerrit.wikimedia.org/r/1109700</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>wmf.19</td>
-      <td>2025-03-04 04:01:33</td>
-      <td>89123</td>
-      <td>31369</td>
-      <td>2025-03-03 03:16:10</td>
-      <td>2025-03-03 19:18:44</td>
-      <td>https://gerrit.wikimedia.org/r/1123806</td>
+      <td>wmf.20</td>
+      <td>2025-03-11 03:02:12</td>
+      <td>53581</td>
+      <td>17954</td>
+      <td>2025-03-10 12:09:11</td>
+      <td>2025-03-10 22:02:58</td>
+      <td>https://gerrit.wikimedia.org/r/1125666</td>
     </tr>
   </tbody>
 </table>
@@ -1082,7 +1082,7 @@ cycle.sort_values(by='lead_time', ascending=False).head()
   </thead>
   <tbody>
     <tr>
-      <th>419</th>
+      <th>126</th>
       <td>wmf.20</td>
       <td>2025-03-11 03:02:12</td>
       <td>19360195</td>
@@ -1092,7 +1092,7 @@ cycle.sort_values(by='lead_time', ascending=False).head()
       <td>https://gerrit.wikimedia.org/r/1057938</td>
     </tr>
     <tr>
-      <th>420</th>
+      <th>127</th>
       <td>wmf.20</td>
       <td>2025-03-11 03:02:12</td>
       <td>18661696</td>
@@ -1102,7 +1102,7 @@ cycle.sort_values(by='lead_time', ascending=False).head()
       <td>https://gerrit.wikimedia.org/r/1060171</td>
     </tr>
     <tr>
-      <th>418</th>
+      <th>125</th>
       <td>wmf.20</td>
       <td>2025-03-11 03:02:12</td>
       <td>17281358</td>
@@ -1112,7 +1112,7 @@ cycle.sort_values(by='lead_time', ascending=False).head()
       <td>https://gerrit.wikimedia.org/r/1064865</td>
     </tr>
     <tr>
-      <th>417</th>
+      <th>124</th>
       <td>wmf.20</td>
       <td>2025-03-11 03:02:12</td>
       <td>15035701</td>
@@ -1122,7 +1122,7 @@ cycle.sort_values(by='lead_time', ascending=False).head()
       <td>https://gerrit.wikimedia.org/r/1073547</td>
     </tr>
     <tr>
-      <th>416</th>
+      <th>123</th>
       <td>wmf.20</td>
       <td>2025-03-11 03:02:12</td>
       <td>14707256</td>
@@ -1182,19 +1182,7 @@ cycle.sort_values(by='lead_time_days').head()
   </thead>
   <tbody>
     <tr>
-      <th>48</th>
-      <td>wmf.19</td>
-      <td>2025-03-04 04:01:33</td>
-      <td>28752978</td>
-      <td>750</td>
-      <td>2024-04-05 09:05:15</td>
-      <td>2025-03-04 03:49:03</td>
-      <td>https://gerrit.wikimedia.org/r/1017178</td>
-      <td>0.008681</td>
-      <td>332.789097</td>
-    </tr>
-    <tr>
-      <th>343</th>
+      <th>50</th>
       <td>wmf.20</td>
       <td>2025-03-11 03:02:12</td>
       <td>1043644</td>
@@ -1206,19 +1194,7 @@ cycle.sort_values(by='lead_time_days').head()
       <td>12.079213</td>
     </tr>
     <tr>
-      <th>265</th>
-      <td>wmf.19</td>
-      <td>2025-03-04 04:01:33</td>
-      <td>4308</td>
-      <td>1848</td>
-      <td>2025-03-04 02:49:45</td>
-      <td>2025-03-04 03:30:45</td>
-      <td>https://gerrit.wikimedia.org/r/1124175</td>
-      <td>0.021389</td>
-      <td>0.049861</td>
-    </tr>
-    <tr>
-      <th>789</th>
+      <th>496</th>
       <td>wmf.21</td>
       <td>2025-03-18 03:02:23</td>
       <td>1676944</td>
@@ -1230,7 +1206,7 @@ cycle.sort_values(by='lead_time_days').head()
       <td>19.409074</td>
     </tr>
     <tr>
-      <th>616</th>
+      <th>323</th>
       <td>wmf.20</td>
       <td>2025-03-11 03:02:12</td>
       <td>6286</td>
@@ -1240,6 +1216,30 @@ cycle.sort_values(by='lead_time_days').head()
       <td>https://gerrit.wikimedia.org/r/1126135</td>
       <td>0.040093</td>
       <td>0.072755</td>
+    </tr>
+    <tr>
+      <th>651</th>
+      <td>wmf.22</td>
+      <td>2025-03-25 09:22:33</td>
+      <td>4450</td>
+      <td>3696</td>
+      <td>2025-03-25 08:08:23</td>
+      <td>2025-03-25 08:20:57</td>
+      <td>https://gerrit.wikimedia.org/r/1130769</td>
+      <td>0.042778</td>
+      <td>0.051505</td>
+    </tr>
+    <tr>
+      <th>233</th>
+      <td>wmf.20</td>
+      <td>2025-03-11 03:02:12</td>
+      <td>175965</td>
+      <td>3726</td>
+      <td>2025-03-09 02:09:27</td>
+      <td>2025-03-11 02:00:06</td>
+      <td>https://gerrit.wikimedia.org/r/1125596</td>
+      <td>0.043125</td>
+      <td>2.036632</td>
     </tr>
   </tbody>
 </table>
@@ -1267,19 +1267,19 @@ plt.suptitle('Lead time of changes per version', x=0.02, y=.92, ha='left', fonts
 plt.show()
 ```
 
-    /tmp/ipykernel_2664032/2853478908.py:6: UserWarning: The figure layout has changed to tight
+    /tmp/ipykernel_3360488/2853478908.py:6: UserWarning: The figure layout has changed to tight
       plt.tight_layout(pad=5)
-    /home/thcipriani/Projects/Wikimedia/train-stats/venv/lib/python3.11/site-packages/seaborn/categorical.py:3544: UserWarning: 73.4% of the points cannot be placed; you may want to decrease the size of the markers or use stripplot.
-      warnings.warn(msg, UserWarning)
     /home/thcipriani/Projects/Wikimedia/train-stats/venv/lib/python3.11/site-packages/seaborn/categorical.py:3544: UserWarning: 69.2% of the points cannot be placed; you may want to decrease the size of the markers or use stripplot.
       warnings.warn(msg, UserWarning)
     /home/thcipriani/Projects/Wikimedia/train-stats/venv/lib/python3.11/site-packages/seaborn/categorical.py:3544: UserWarning: 73.9% of the points cannot be placed; you may want to decrease the size of the markers or use stripplot.
       warnings.warn(msg, UserWarning)
-    /home/thcipriani/Projects/Wikimedia/train-stats/venv/lib/python3.11/site-packages/seaborn/categorical.py:3544: UserWarning: 79.9% of the points cannot be placed; you may want to decrease the size of the markers or use stripplot.
+    /home/thcipriani/Projects/Wikimedia/train-stats/venv/lib/python3.11/site-packages/seaborn/categorical.py:3544: UserWarning: 84.8% of the points cannot be placed; you may want to decrease the size of the markers or use stripplot.
       warnings.warn(msg, UserWarning)
     /home/thcipriani/Projects/Wikimedia/train-stats/venv/lib/python3.11/site-packages/seaborn/categorical.py:3544: UserWarning: 74.5% of the points cannot be placed; you may want to decrease the size of the markers or use stripplot.
       warnings.warn(msg, UserWarning)
     /home/thcipriani/Projects/Wikimedia/train-stats/venv/lib/python3.11/site-packages/seaborn/categorical.py:3544: UserWarning: 80.8% of the points cannot be placed; you may want to decrease the size of the markers or use stripplot.
+      warnings.warn(msg, UserWarning)
+    /home/thcipriani/Projects/Wikimedia/train-stats/venv/lib/python3.11/site-packages/seaborn/categorical.py:3544: UserWarning: 88.2% of the points cannot be placed; you may want to decrease the size of the markers or use stripplot.
       warnings.warn(msg, UserWarning)
 
 
@@ -1329,17 +1329,17 @@ plt.suptitle('Cycle time of changes per version', x=0.02, y=.92, ha='left', font
 plt.show()
 ```
 
-    /home/thcipriani/Projects/Wikimedia/train-stats/venv/lib/python3.11/site-packages/seaborn/categorical.py:3544: UserWarning: 65.2% of the points cannot be placed; you may want to decrease the size of the markers or use stripplot.
+    /home/thcipriani/Projects/Wikimedia/train-stats/venv/lib/python3.11/site-packages/seaborn/categorical.py:3544: UserWarning: 74.5% of the points cannot be placed; you may want to decrease the size of the markers or use stripplot.
       warnings.warn(msg, UserWarning)
-    /home/thcipriani/Projects/Wikimedia/train-stats/venv/lib/python3.11/site-packages/seaborn/categorical.py:3544: UserWarning: 61.3% of the points cannot be placed; you may want to decrease the size of the markers or use stripplot.
+    /home/thcipriani/Projects/Wikimedia/train-stats/venv/lib/python3.11/site-packages/seaborn/categorical.py:3544: UserWarning: 78.0% of the points cannot be placed; you may want to decrease the size of the markers or use stripplot.
       warnings.warn(msg, UserWarning)
-    /home/thcipriani/Projects/Wikimedia/train-stats/venv/lib/python3.11/site-packages/seaborn/categorical.py:3544: UserWarning: 63.4% of the points cannot be placed; you may want to decrease the size of the markers or use stripplot.
+    /home/thcipriani/Projects/Wikimedia/train-stats/venv/lib/python3.11/site-packages/seaborn/categorical.py:3544: UserWarning: 87.3% of the points cannot be placed; you may want to decrease the size of the markers or use stripplot.
       warnings.warn(msg, UserWarning)
-    /home/thcipriani/Projects/Wikimedia/train-stats/venv/lib/python3.11/site-packages/seaborn/categorical.py:3544: UserWarning: 71.0% of the points cannot be placed; you may want to decrease the size of the markers or use stripplot.
+    /home/thcipriani/Projects/Wikimedia/train-stats/venv/lib/python3.11/site-packages/seaborn/categorical.py:3544: UserWarning: 77.7% of the points cannot be placed; you may want to decrease the size of the markers or use stripplot.
       warnings.warn(msg, UserWarning)
-    /home/thcipriani/Projects/Wikimedia/train-stats/venv/lib/python3.11/site-packages/seaborn/categorical.py:3544: UserWarning: 66.8% of the points cannot be placed; you may want to decrease the size of the markers or use stripplot.
+    /home/thcipriani/Projects/Wikimedia/train-stats/venv/lib/python3.11/site-packages/seaborn/categorical.py:3544: UserWarning: 80.1% of the points cannot be placed; you may want to decrease the size of the markers or use stripplot.
       warnings.warn(msg, UserWarning)
-    /home/thcipriani/Projects/Wikimedia/train-stats/venv/lib/python3.11/site-packages/seaborn/categorical.py:3544: UserWarning: 68.3% of the points cannot be placed; you may want to decrease the size of the markers or use stripplot.
+    /home/thcipriani/Projects/Wikimedia/train-stats/venv/lib/python3.11/site-packages/seaborn/categorical.py:3544: UserWarning: 89.7% of the points cannot be placed; you may want to decrease the size of the markers or use stripplot.
       warnings.warn(msg, UserWarning)
 
 
@@ -1519,23 +1519,23 @@ train_bugs.sort_values(by="bug_count", ascending=False).head()
       <td>13</td>
     </tr>
     <tr>
-      <th>194</th>
-      <td>1.37.0-wmf.5</td>
-      <td>11</td>
-    </tr>
-    <tr>
       <th>361</th>
       <td>1.44.0-wmf.20</td>
       <td>11</td>
     </tr>
     <tr>
-      <th>119</th>
-      <td>1.34.0-wmf.11</td>
+      <th>90</th>
+      <td>1.32.0-wmf.24</td>
       <td>11</td>
     </tr>
     <tr>
-      <th>90</th>
-      <td>1.32.0-wmf.24</td>
+      <th>206</th>
+      <td>1.37.0-wmf.20</td>
+      <td>11</td>
+    </tr>
+    <tr>
+      <th>194</th>
+      <td>1.37.0-wmf.5</td>
       <td>11</td>
     </tr>
   </tbody>
@@ -1716,15 +1716,15 @@ train_bugs[train_bugs['version'] == TRAINS[-1]]
   </thead>
   <tbody>
     <tr>
-      <th>362</th>
-      <td>1.44.0-wmf.21</td>
-      <td>7</td>
-      <td>2</td>
-      <td>5</td>
-      <td>62722325.0</td>
+      <th>363</th>
+      <td>1.44.0-wmf.22</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>202070966.0</td>
       <td>53.0</td>
-      <td>62992656.0</td>
-      <td>300</td>
+      <td>202473106.0</td>
+      <td>591</td>
     </tr>
   </tbody>
 </table>
@@ -1932,15 +1932,15 @@ pcommdf.describe()
   <tbody>
     <tr>
       <th>count</th>
-      <td>131618.000000</td>
+      <td>132209.000000</td>
     </tr>
     <tr>
       <th>mean</th>
-      <td>3.500448</td>
+      <td>3.496328</td>
     </tr>
     <tr>
       <th>std</th>
-      <td>5.117837</td>
+      <td>5.112172</td>
     </tr>
     <tr>
       <th>min</th>
@@ -2031,33 +2031,33 @@ pcommdf[np.abs(pcommdf.comments - pcommdf.comments.mean()) <= (5 * pcommdf.comme
       <td>...</td>
     </tr>
     <tr>
-      <th>131613</th>
-      <td>https://gerrit.wikimedia.org/r/1126200</td>
+      <th>132204</th>
+      <td>https://gerrit.wikimedia.org/r/1125188</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>132205</th>
+      <td>https://gerrit.wikimedia.org/r/1125187</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>132206</th>
+      <td>https://gerrit.wikimedia.org/r/1125142</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>132207</th>
+      <td>https://gerrit.wikimedia.org/r/1124791</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>132208</th>
+      <td>https://gerrit.wikimedia.org/r/1123386</td>
       <td>2</td>
-    </tr>
-    <tr>
-      <th>131614</th>
-      <td>https://gerrit.wikimedia.org/r/1128528</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>131615</th>
-      <td>https://gerrit.wikimedia.org/r/1127550</td>
-      <td>2</td>
-    </tr>
-    <tr>
-      <th>131616</th>
-      <td>https://gerrit.wikimedia.org/r/1127885</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>131617</th>
-      <td>https://gerrit.wikimedia.org/r/1103331</td>
-      <td>1</td>
     </tr>
   </tbody>
 </table>
-<p>130872 rows × 2 columns</p>
+<p>131461 rows × 2 columns</p>
 </div>
 
 
@@ -2164,7 +2164,7 @@ plt.xticks(rotation=90)
 
 
     (array([-50.,   0.,  50., 100., 150., 200., 250., 300., 350., 400., 450.]),
-     [Text(-50.0, 0, '1.42.0-wmf.21'),
+     [Text(-50.0, 0, '1.42.0-wmf.22'),
       Text(0.0, 0, '1.27.0-wmf.16'),
       Text(50.0, 0, '1.30.0-wmf.6'),
       Text(100.0, 0, '1.32.0-wmf.23'),
@@ -2216,15 +2216,15 @@ patch_authors.describe()
   <tbody>
     <tr>
       <th>count</th>
-      <td>389.000000</td>
+      <td>390.000000</td>
     </tr>
     <tr>
       <th>mean</th>
-      <td>69.547558</td>
+      <td>69.589744</td>
     </tr>
     <tr>
       <th>std</th>
-      <td>12.360184</td>
+      <td>12.372367</td>
     </tr>
     <tr>
       <th>min</th>
@@ -2260,7 +2260,7 @@ sns.jointplot(data=train_bugs, x='patches', y='resolved_blockers', kind='reg')
 
 
 
-    <seaborn.axisgrid.JointGrid at 0x7f3b49b365d0>
+    <seaborn.axisgrid.JointGrid at 0x7f89e6204790>
 
 
 
@@ -2360,17 +2360,17 @@ escapes.version.value_counts()
 
     version
     1.34.0-wmf.13    13
-    1.44.0-wmf.20    11
+    1.37.0-wmf.5     11
     1.37.0-wmf.20    11
     1.34.0-wmf.11    11
-    1.32.0-wmf.24    11
+    1.44.0-wmf.20    11
                      ..
+    1.30.0-wmf.11     1
     1.34.0-wmf.24     1
     1.30.0-wmf.13     1
     1.34.0-wmf.23     1
-    1.39.0-wmf.6      1
     1.44.0-wmf.8      1
-    Name: count, Length: 363, dtype: int64
+    Name: count, Length: 364, dtype: int64
 
 
 
