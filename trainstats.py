@@ -28,7 +28,9 @@ FMT_URL = 'MediaWiki_{}/Changelog'
 USER_AGENT = 'trainstats/0.0.1 (https://gitlab.wikimedia.org/thcipriani/train-stats)'
 
 DB_PATH = os.path.join(os.path.dirname(__file__), 'data', 'train.db')
-
+GROUP0_WIKI = 'mediawikiwiki'
+GROUP1_WIKI = 'commonswiki'
+GROUP2_WIKI = 'enwiki'
 
 class VersionDiff(object):
     def __init__(self):
@@ -127,6 +129,10 @@ def wikiversion_info(version, change):
         'git', '-C', git.MWCONFIG_PATH, 'log', '-1', '--format=%ct', change
     ]).decode('utf8').strip())
 
+    change_id = subprocess.check_output([
+        'git', '-C', git.MWCONFIG_PATH, 'log', '-1', '--format=%(trailers:key=Change-Id,valueonly=true)', change
+    ]).strip()
+
     # That's right. It's a regex for parsing a diff. Fight me.
     for line in diff.splitlines():
         line = line.decode('utf8')
@@ -172,6 +178,7 @@ def wikiversion_info(version, change):
         'committer': committer,
         'commit_date': commit_date,
         'version': version,
+        'change_id': change_id.decode('utf8'),
         'sha1': change.decode('utf8'),
     }
 
@@ -182,12 +189,25 @@ def get_conductor(version, changes):
     the author is probably the conductor
     """
     conductors = []
-    for change in changes:
+    group0_rollforward = None
+    for change in sorted(changes, key=lambda x: x['commit_date']):
         if change['rollforward']:
             # debug
             print('{}: {} ROLLFORWARD'.format(change['committer'], change['sha1']))
             conductors.append(change['committer'])
-    return mode([c for c in conductors if c != 'jenkins-bot'])
+            if change['wikis'].get(GROUP0_WIKI, VersionDiff()).new_version == version:
+                if group0_rollforward is None:
+                    group0_rollforward = change
+    conductor = mode([c for c in conductors if c != 'jenkins-bot'])
+    if 'spiderpig' in conductor.lower():
+        patch_info = gerrit.search(change_id=group0_rollforward['change_id'])
+        initiator = patch_info[0]['initiator']
+        if initiator:
+            conductor = initiator
+        else:
+            import pdb; pdb.set_trace()
+            raise RuntimeError(f'Couldn\'t find initiator for {group0_rollforward["change_id"]}')
+    return conductor
 
 
 def time_rolledback(version, changes):
@@ -231,9 +251,9 @@ def total_train_time(version, changes):
 
 def group_times(version, changes):
     groups = [
-        'mediawikiwiki',
-        'commonswiki',
-        'enwiki',
+        GROUP0_WIKI,
+        GROUP1_WIKI,
+        GROUP2_WIKI,
     ]
     times = {}
     for change in sorted(changes, key=lambda x: x['commit_date']):

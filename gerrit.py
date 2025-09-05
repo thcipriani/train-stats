@@ -56,6 +56,21 @@ def get_owner(patch_json):
         owner_email = ''
     return '{}{}'.format(owner_name, owner_email)
 
+def get_initiator(patch_json):
+    """
+    Since introducing spiderpig, this is how we find out who initiated
+    the train.
+    """
+    # Code-Review+2\n\nInitiated by dancy@deploy1003
+    initiated_by_regex = re.compile(r'Initiated by (?P<conductor>[^@]+)@')
+    initiator = None
+    for msg in patch_json.get('messages', []):
+        m = initiated_by_regex.search(msg.get('message', ''))
+        if m:
+            initiator = m.group(1)
+            break
+    return initiator
+
 def confirm_change_id(patches, change_id, changelog_item):
     """
     Find the right patch in the list of patches
@@ -192,6 +207,7 @@ def search(change_id=None, branch=None, changelog_item=None):
                         and msg.get('author', {}).get('_account_id', 75) != 75
                     )
                 ]),
+                'initiator': get_initiator(patch_json),
                 'link': os.path.join(URL, str(patch_json['_number'])),
                 'patchset': patch_json['_number'],
             }
