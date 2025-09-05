@@ -70,8 +70,8 @@ def confirm_change_id(patches, change_id, changelog_item):
         patch_subj = patch['revisions'][sha1]['commit']['message'].splitlines()[0]
         subjects.append(patch_subj)
         # substring matches with, like ::static_method don't match so...
-        if (re.sub('\W', '.', patch_subj) in
-                re.sub('\W', '.', changelog_item)):
+        if (re.sub(r'\W', '.', patch_subj) in
+                re.sub(r'\W', '.', changelog_item)):
             patch_json = patch
             break
 
@@ -79,9 +79,9 @@ def confirm_change_id(patches, change_id, changelog_item):
         cr = patch_json['current_revision']
         return [patch_json]
     except UnboundLocalError:
-        txt = re.sub('\W', '.', changelog_item)
+        txt = re.sub(r'\W', '.', changelog_item)
         print(f'Couldn\'t find the Gerrit change for: {txt} ({change_id})')
-        print([re.sub('\W', '.', sub) for sub in subjects])
+        print([re.sub(r'\W', '.', sub) for sub in subjects])
         # raise
         # Sometimes the changelog notes don't match the patches...
         #
