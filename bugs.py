@@ -85,6 +85,7 @@ class Bugs(object):
         query = {
             'constraints': {
                 'phids': projects,
+                'status': 'all',
             },
         }
         if after is not None:
@@ -129,25 +130,28 @@ class Bugs(object):
             (Pdb) self.users[self.bugs[290226]['task']['fields']['closerPHID']]
         """
         for task_id, task in self.bugs.items():
-            task['phab'] = {}
-            task['phab']['projects'] = []
-            task['phab']['closer'] = None
-            task['phab']['author'] = None
-            closer = task['task']['fields'].get('closerPHID', False)
-            for proj in task['task']['attachments']['projects']['projectPHIDs']:
-                task['phab']['projects'].append(self.projects[proj])
+            try:
+                task['phab'] = {}
+                task['phab']['projects'] = []
+                task['phab']['closer'] = None
+                task['phab']['author'] = None
+                closer = task['task']['fields'].get('closerPHID', False)
+                for proj in task['task']['attachments']['projects']['projectPHIDs']:
+                    task['phab']['projects'].append(self.projects[proj])
 
-            if closer and self.users:
-                task['phab']['closer'] = self.users[closer]
+                if closer and self.users:
+                    task['phab']['closer'] = self.users[closer]
 
-            task['phab']['url'] = f'https://phabricator.wikimedia.org/T{task["task"]["id"]}'
-            task['phab']['title'] = task['task']['fields']['name']
-            task['phab']['created'] = task['task']['fields']['dateCreated']
-            task['phab']['closed'] = task['task']['fields']['dateClosed']
-            task['phab']['status'] = task['task']['fields']['status']['value']
-            task['phab']['priority'] = task['task']['fields']['priority']['value']
-            if self.users:
-                task['phab']['author'] = self.users[task['task']['fields']['authorPHID']]
+                task['phab']['url'] = f'https://phabricator.wikimedia.org/T{task["task"]["id"]}'
+                task['phab']['title'] = task['task']['fields']['name']
+                task['phab']['created'] = task['task']['fields']['dateCreated']
+                task['phab']['closed'] = task['task']['fields']['dateClosed']
+                task['phab']['status'] = task['task']['fields']['status']['value']
+                task['phab']['priority'] = task['task']['fields']['priority']['value']
+                if self.users:
+                    task['phab']['author'] = self.users[task['task']['fields']['authorPHID']]
+            except KeyError:
+                import pdb; pdb.set_trace()
 
     def search(self):
         bugs = [*self.backports.keys()]
