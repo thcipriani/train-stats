@@ -28,6 +28,7 @@ FMT_URL = 'MediaWiki_{}/Changelog'
 USER_AGENT = 'trainstats/0.0.1 (https://gitlab.wikimedia.org/thcipriani/train-stats)'
 
 DB_PATH = os.path.join(os.path.dirname(__file__), 'data', 'train.db')
+TEST_WIKI = 'testwiki'
 GROUP0_WIKI = 'mediawikiwiki'
 GROUP1_WIKI = 'commonswiki'
 GROUP2_WIKI = 'enwiki'
@@ -288,6 +289,20 @@ def train_delays(groups_times, start_time):
     return delays.values()
 
 
+def get_deploys_for_version(changes):
+    deploys = []
+    for change in changes:
+        for wiki in [TEST_WIKI, GROUP0_WIKI, GROUP1_WIKI, GROUP2_WIKI]:
+            if wiki not in change['wikis']:
+                continue
+            deploys.append({
+                'wiki': wiki,
+                'timestamp': change['commit_date'],
+                'version': str(change['wikis'][wiki].new_version)
+            })
+    return deploys
+
+
 def get_wikiversion_changes(version):
     # Oldest commit to wikiversions mentioning "version"
     oldest_cmd = [
@@ -458,6 +473,16 @@ def setup_db():
             FOREIGN KEY(train_id) REFERENCES train(id)
         );
     ''')
+
+    crs.execute('''
+        CREATE TABLE IF NOT EXISTS deploy (
+            id INTEGER PRIMARY KEY,
+            timestamp INTEGER NOT NULL,
+            wiki TEXT NOT NULL,
+            version TEXT NOT NULL
+        );
+    ''')
+
     # Needed to count patches as sub-query
     crs.execute('CREATE INDEX IF NOT EXISTS file_patch_id ON file(patch_id);')
     conn.commit()
@@ -680,6 +705,13 @@ if __name__ == '__main__':
             conn.commit()
 
         if not args.only_blockers and not args.only_patches:
+            for deploy in get_deploys_for_version(wikiversion_changes):
+                crs.execute('''
+                    INSERT into deploy (timestamp, wiki, version)
+                    VALUES (?, ?, ?)''',
+                    (deploy['timestamp'], deploy['wiki'], deploy['version']))
+            conn.commit()
+
             wmf_version = version
             if not wmf_version.startswith('wmf/'):
                 wmf_version = f'wmf/{wmf_version}'
