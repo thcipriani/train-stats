@@ -686,13 +686,17 @@ if __name__ == '__main__':
                 # Oddly "_number" seems unique and that's about it :(
                 except sqlite3.IntegrityError:
                     print(patch_data)
-                    if patch_data['project'] == 'mediawiki/extensions/OATHAuth' and \
+                    if patch_data['project'] in ['mediawiki/extensions/OATHAuth','mediawiki/extensions/WebAuthn'] and \
                             patch_data['submitted'] < 1769486528:
                             # Duplicate patch before 1.46.0-wmf.13 train start time is OK since Reedy did a mergy:
+                            #
                             # https://gerrit.wikimedia.org/r/1221161
+                            #
+                            # Example: https://gerrit.wikimedia.org/r/1229685 is in WebAuthn for 1.46.0-wmf.13 AND OATHAuth for 1.46.0-wmf.14
                             print(f'MERGY: Skipping duplicate patch for {patch_data["link"]}')
                             continue
-                    raise
+                    else:
+                        raise
 
                 patch_id = crs.execute(
                     'SELECT id FROM patch WHERE link = ?', (patch_data['link'],)
