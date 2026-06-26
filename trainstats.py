@@ -528,9 +528,9 @@ if __name__ == '__main__':
             sys.exit(0)
 
         rollbacks = count_rollbacks(version, wikiversion_changes)
-        conductor = get_conductor(version, wikiversion_changes)
+        conductor = get_conductor(wmf_version(version), wikiversion_changes)
         rollbacks_time = time_rolledback(version, wikiversion_changes)
-        groups_times = group_times(version, wikiversion_changes)
+        groups_times = group_times(wmf_version(version), wikiversion_changes)
         group0, group1, group2 = train_delays(groups_times, start_time)
         train_total_time = total_train_time(version, wikiversion_changes)
 
