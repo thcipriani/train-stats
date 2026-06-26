@@ -4,6 +4,7 @@ import argparse
 import csv
 import json
 import os
+import packaging.version
 import re
 import subprocess
 import sys
@@ -13,7 +14,6 @@ import requests
 from bs4 import BeautifulSoup
 
 from datetime import date, datetime, timedelta
-from distutils.version import LooseVersion
 from statistics import mode
 import sqlite3
 
@@ -105,17 +105,26 @@ def get_patches_for_version(version):
     return (patches, count)
 
 
+def wmf_version(version: str) -> packaging.version.Version:
+    if version == "master":
+        return packaging.version.Version(str(sys.maxsize))
+    if version == "next":
+        return packaging.version.Version(str(sys.maxsize - 1))
+
+    return packaging.version.Version(re.sub(r"[^.\d]", "", version))
+
+
 def set_version(version_diff, wikiversions_line):
     if wikiversions_line['diff'] == '-':
-        version_diff.old_version = LooseVersion(wikiversions_line['version'])
+        version_diff.old_version = wmf_version(wikiversions_line['version'])
     else:
-        version_diff.new_version = LooseVersion(wikiversions_line['version'])
+        version_diff.new_version = wmf_version(wikiversions_line['version'])
 
     return version_diff
 
 
 def wikiversion_info(version, change):
-    wikiversion = LooseVersion(version)
+    wikiversion = wmf_version(version)
     wikis = {}
     # Get the diff for the change
     diff = subprocess.check_output([
@@ -199,6 +208,9 @@ def get_conductor(version, changes):
             if change['wikis'].get(GROUP0_WIKI, VersionDiff()).new_version == version:
                 if group0_rollforward is None:
                     group0_rollforward = change
+                    print('{}: {} GROUP0 ROLLFORWARD'.format(change['committer'], change['sha1']))
+    import pdb
+    pdb.set_trace()
     conductor = mode([c for c in conductors if c != 'jenkins-bot'])
     if 'spiderpig' in conductor.lower():
         patch_info = gerrit.search(change_id=group0_rollforward['change_id'])
