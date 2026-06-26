@@ -209,8 +209,8 @@ def get_conductor(version, changes):
                 if group0_rollforward is None:
                     group0_rollforward = change
                     print('{}: {} GROUP0 ROLLFORWARD'.format(change['committer'], change['sha1']))
-    import pdb
-    pdb.set_trace()
+            import pdb
+            pdb.set_trace()
     conductor = mode([c for c in conductors if c != 'jenkins-bot'])
     if 'spiderpig' in conductor.lower():
         patch_info = gerrit.search(change_id=group0_rollforward['change_id'])
