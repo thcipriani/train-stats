@@ -37,7 +37,12 @@ newversion() {
         . "$SCRIPT_DIR"/../venv/bin/activate
         p="$SCRIPT_DIR"/../venv/bin/python3
         echo 'Activating magic 2'
+    elif [ -d "$SCRIPT_DIR"/.venv ]; then
+        . "$SCRIPT_DIR"/.venv/bin/activate
+        p="$SCRIPT_DIR"/.venv/bin/python3
+        echo 'Activating magic 3'
     fi
+
     $p "$SCRIPT_DIR"/trainstats.py -w "$version"
 }
 
