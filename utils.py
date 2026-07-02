@@ -2,6 +2,22 @@
 
 import argparse
 import re
+import sys
+from pathlib import Path
+
+from phabricator import Phabricator
+
+
+def init_phab():
+    arcrc = Path.home() / '.arcrc'
+    if arcrc.exists():
+        return Phabricator()
+    host = os.environ.get('WMF_PHAB_HOST', 'https://phabricator.wikimedia.org/api/')
+    token = os.environ.get('WMF_PHAB_TOKEN') or ''
+    if not token:
+        print('Cannot find WMF_PHAB_TOKEN and no ~/.arcrc present. Giving up.')
+        sys.exit(1)
+    return Phabricator(host=host, token=token)
 
 
 def mediawiki_version(version):

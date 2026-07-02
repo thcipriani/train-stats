@@ -11,12 +11,13 @@ import argparse
 from flask import Flask
 from flask.templating import render_template
 
-from phabricator import Phabricator, APIError
+from phabricator import APIError
 from sparklines import sparklines
 import sqlite3
 
 import trainstats
 import trainblockers
+import utils
 
 def _sparklines(arr: list) -> str:
     return ''.join([x for x in sparklines(arr)])
@@ -75,7 +76,7 @@ class TrainEmail(object):
         self.crs = crs
         self.last_five_version_ids = None
         self.version = version
-        phab = Phabricator()
+        phab = utils.init_phab()
         self.train_blocker  = trainblockers.TrainBlockers(self.version, phab)
         try:
             self.conductor = trainblockers.get_phab_user(

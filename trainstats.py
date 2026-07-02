@@ -501,6 +501,7 @@ def setup_db():
 
 if __name__ == '__main__':
     args = utils.parse_args()
+    utils.init_phab()
     conn = setup_db()
     crs = conn.cursor()
 

@@ -6,12 +6,11 @@ import subprocess
 import utils
 import git
 
-from phabricator import Phabricator
 from phabricator import APIError
 
 
 def new_trainblockers(version):
-    phab = Phabricator()
+    phab = utils.init_phab()
     return TrainBlockers(version, phab)
 
 

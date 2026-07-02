@@ -23,10 +23,8 @@ import sys
 import utils
 import gerrit
 
-from phabricator import Phabricator
-
 def get_all(version):
-    pe = Bugs(version, Phabricator())
+    pe = Bugs(version, utils.init_phab())
     return pe.search()
 
 
