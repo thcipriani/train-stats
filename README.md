@@ -922,13 +922,13 @@ patches.set_index('submitted', inplace=True)
 
 
 ```python
-out = patches.groupby(pd.Grouper(freq='M')).apply(lambda x: x)
+out = patches.groupby(pd.Grouper(freq='ME')).apply(lambda x: x)
 out = out[out['link'] != 'https://gerrit.wikimedia.org/r/#/q/9a08dbab,n,z'] # The one patch that inserts 17.2M lines of code
 out['ok'] = out['loc'].cumsum()
 ```
 
     /tmp/ipykernel_3411070/774798835.py:1: FutureWarning: 'M' is deprecated and will be removed in a future version, please use 'ME' instead.
-      out = patches.groupby(pd.Grouper(freq='M')).apply(lambda x: x)
+      out = patches.groupby(pd.Grouper(freq='ME')).apply(lambda x: x)
 
 
 ## Cycle time/Lead time
