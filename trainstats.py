@@ -9,8 +9,6 @@ import re
 import subprocess
 import sys
 
-import requests
-
 from bs4 import BeautifulSoup
 
 from datetime import date, datetime, timedelta
@@ -25,13 +23,13 @@ import utils
 
 BASE_URL = 'https://www.mediawiki.org/wiki/'
 FMT_URL = 'MediaWiki_{}/Changelog'
-USER_AGENT = 'trainstats/0.0.1 (https://gitlab.wikimedia.org/thcipriani/train-stats)'
 
-DB_PATH = os.path.join(os.path.dirname(__file__), 'data', 'train.db')
+DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'train.db')
 TEST_WIKI = 'testwiki'
 GROUP0_WIKI = 'mediawikiwiki'
 GROUP1_WIKI = 'commonswiki'
 GROUP2_WIKI = 'enwiki'
+SESSION = utils.make_session()
 
 class VersionDiff(object):
     def __init__(self):
@@ -83,8 +81,7 @@ def get_patches_for_version(version):
     mw_url = get_mw_url_for_version(version)
     patches = []
 
-    headers = {'User-Agent': USER_AGENT}
-    r = requests.get(mw_url, headers=headers)
+    r = SESSION.get(mw_url)
     r.raise_for_status()
 
     soup = BeautifulSoup(r.text, 'html.parser')

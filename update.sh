@@ -3,31 +3,32 @@
 set -euo pipefail
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+MW_CONFIG="$SCRIPT_DIR"/submodules/operations/mediawiki-config
+
+# How long does group2 need to be on a version before we call it "Done"?
+# I guess 24 hours ¯\_(ツ)_/¯
+STABLE_WIKIVERSION_TIME=$(( 24 * 60 * 60 ))
 
 usage() {
     cat<<USE
     USAGE:
-      $0 <version>
-    EXAMPLE:
+      $0 <version|auto>
+    EXAMPLES:
       $0 1.38.0-wmf.2
+      $0 auto
 USE
 }
 
 commit() {
-    local msg
-    msg="$@"
-    git -C "$SCRIPT_DIR" commit -a -m "$msg"
+    git -C "$SCRIPT_DIR" commit -a -m "$@"
 }
 
 submodules() {
-    git -C "$SCRIPT_DIR"/submodules/operations/mediawiki-config fetch || :
-    git -C "$SCRIPT_DIR"/submodules/operations/mediawiki-config checkout --force origin/master || :
-    commit 'Bump operations/mediawiki-config' || :
+    git -C "$MW_CONFIG" fetch || :
+    git -C "$MW_CONFIG" checkout --force origin/master || :
 }
 
-newversion() {
-    local version python
-    version="$1"
+pick_python() {
     p=python3
     if [ -d "$SCRIPT_DIR"/venv ]; then
         . "$SCRIPT_DIR"/venv/bin/activate
@@ -42,7 +43,15 @@ newversion() {
         p="$SCRIPT_DIR"/.venv/bin/python3
         echo 'Activating magic 3'
     fi
+}
 
+collect() {
+    "$p" "$SCRIPT_DIR"/deployinfo.py || echo 'deployinfo.py failed :(' >&2
+}
+
+newversion() {
+    local version
+    version="$1"
     $p "$SCRIPT_DIR"/trainstats.py -w "$version"
 }
 
@@ -61,13 +70,21 @@ main() {
         version="$@"
     fi
 
+    pick_python
+    collect
+
+    submodules
+
     if [[ "$version" == "auto" ]]; then
-        version=$(git ls-remote --heads https://gerrit.wikimedia.org/r/mediawiki/core refs/heads/wmf/1* | \
-            awk '{print $2}' | \
-            sort --version-sort --reverse | \
-            head -1 | \
-            cut -d'/' -f4
-        )
+        version="$(git -C "$MW_CONFIG" show origin/master:wikiversions.json | \
+            jq -er '.enwiki | ltrimstr("php-")')"
+        last_change="$(git -C "$MW_CONFIG" log -1 --format=%ct origin/master -- wikiversions.json)"
+        age=$(( $(date +%s) - last_change ))
+        if (( age <  STABLE_WIKIVERSION_TIME )); then
+            printf 'enwiki went to %s %ss ago. Waiting for version to settle. Exiting...' \
+                "$version" "$age" >&2
+            exit 0
+        fi
     fi
 
     indb=$("$SCRIPT_DIR"/scripts/get_version.py "$version")
@@ -77,7 +94,6 @@ main() {
         exit 0
     fi
 
-    submodules
     newversion "$version"
     update_trains "$version"
     cd "$SCRIPT_DIR"
